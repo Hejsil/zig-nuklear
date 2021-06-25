@@ -15,8 +15,8 @@ WIP bindings for [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear).
 
 ## TODO:
 
-[ ] Provide wrappers for all ui functions provided by Nuklear
-[ ] Provide a few backends with minimal system dependencies:
-  [ ] Windows (using gdi)
-  [ ] Linux (x11, maybe wayland)
+* [ ] Provide wrappers for all ui functions provided by Nuklear
+* [ ] Provide a few backends with minimal system dependencies:
+  * [ ] Windows (using gdi)
+  * [ ] Linux (x11, maybe wayland)
 
