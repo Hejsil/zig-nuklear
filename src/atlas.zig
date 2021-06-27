@@ -1,5 +1,5 @@
 const c = @import("c.zig");
-const nk = @import("nuklear.zig");
+const nk = @import("../nuklear.zig");
 const std = @import("std");
 
 const builtin = std.builtin;

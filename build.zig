@@ -1,5 +1,12 @@
 const std = @import("std");
 
+const Pkg = std.build.Pkg;
+
+const pkg = Pkg{
+    .name = "nuklear",
+    .path = "nuklear.zig",
+};
+
 pub fn build(b: *std.build.Builder) void {
     const mode = b.standardReleaseOptions();
 
@@ -10,11 +17,10 @@ pub fn build(b: *std.build.Builder) void {
     lib.setBuildMode(mode);
     lib.install();
 
-    var tests = b.addTest("src/nuklear.zig");
+    const test_step = b.step("test", "Run library tests");
+    const tests = b.addTest("nuklear.zig");
     tests.addIncludeDir("src/c");
     tests.linkLibrary(lib);
     tests.setBuildMode(mode);
-
-    const test_step = b.step("test", "Run library tests");
     test_step.dependOn(&tests.step);
 }

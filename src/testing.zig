@@ -1,4 +1,4 @@
-const nk = @import("nuklear.zig");
+const nk = @import("../nuklear.zig");
 const std = @import("std");
 
 const heap = std.heap;
