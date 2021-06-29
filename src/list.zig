@@ -8,16 +8,23 @@ const testing = std.testing;
 pub fn begin(
     ctx: *nk.Context,
     comptime Id: type,
-    flags: nk.Flags,
     row_height: usize,
     row_count: usize,
+    flags: nk.PanelFlags,
 ) ?View {
     const id = nk.typeId(Id);
     const h = @intCast(c_int, row_height);
     const cnt = @intCast(c_int, row_count);
 
     var out: c.nk_list_view = undefined;
-    if (c.nk_list_view_begin(ctx, &out, nk.slice(mem.asBytes(&id)), flags, h, cnt) == 0)
+    if (c.nk_list_view_begin(
+        ctx,
+        &out,
+        nk.slice(flags.title orelse mem.asBytes(&id)),
+        flags.toNuklear(),
+        h,
+        cnt,
+    ) == 0)
         return null;
 
     return View{
@@ -63,12 +70,9 @@ test "list" {
     var ctx = &try nk.testing.init();
     defer nk.free(ctx);
 
-    const flags = c.NK_WINDOW_BORDER | c.NK_WINDOW_MOVABLE | c.NK_WINDOW_SCALABLE |
-        c.NK_WINDOW_CLOSABLE | c.NK_WINDOW_MINIMIZABLE | c.NK_WINDOW_TITLE;
-
-    if (nk.window.begin(ctx, opaque {}, "test", nk.rect(10, 10, 10, 10), flags)) |win| {
+    if (nk.window.begin(ctx, opaque {}, nk.rect(10, 10, 10, 10), .{})) |win| {
         nk.layout.rowDynamic(ctx, 10, 1);
-        if (nk.list.begin(ctx, opaque {}, flags, 10, 10)) |list| {
+        if (nk.list.begin(ctx, opaque {}, 10, 10, .{})) |list| {
             defer nk.list.end(list);
         }
     }

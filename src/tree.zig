@@ -229,7 +229,7 @@ test "list" {
         c.NK_WINDOW_CLOSABLE | c.NK_WINDOW_MINIMIZABLE | c.NK_WINDOW_TITLE;
 
     var selected: bool = false;
-    if (nk.window.begin(ctx, opaque {}, "test", nk.rect(10, 10, 10, 10), flags)) |win| {
+    if (nk.window.begin(ctx, opaque {}, nk.rect(10, 10, 10, 10), .{})) |win| {
         nk.layout.rowDynamic(ctx, 10, 1);
         if (nk.tree.push(ctx, opaque {}, .NK_TREE_TAB, "tree", .NK_MINIMIZED)) {
             defer nk.tree.pop(ctx);

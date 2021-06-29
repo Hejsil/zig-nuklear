@@ -11,27 +11,25 @@ const testing = std.testing;
 pub fn begin(
     ctx: *nk.Context,
     comptime Id: type,
-    title: []const u8,
     bounds: nk.Rect,
-    flags: nk.Flags,
+    flags: nk.PanelFlags,
 ) ?*const nk.Window {
     const id = nk.typeId(Id);
-    return beginTitled(ctx, mem.asBytes(&id), title, bounds, flags);
+    return beginTitled(ctx, mem.asBytes(&id), bounds, flags);
 }
 
 pub fn beginTitled(
     ctx: *nk.Context,
     name: []const u8,
-    title: []const u8,
     bounds: nk.Rect,
-    flags: nk.Flags,
+    flags: nk.PanelFlags,
 ) ?*const nk.Window {
     const res = c.nk_begin_titled(
         ctx,
         nk.slice(name),
-        nk.slice(title),
+        nk.slice(flags.title orelse ""),
         bounds,
-        flags,
+        flags.toNuklear(),
     );
     if (res == 0)
         return null;
@@ -78,11 +76,8 @@ test "window" {
     var ctx = &try nk.testing.init();
     defer nk.free(ctx);
 
-    const flags = c.NK_WINDOW_BORDER | c.NK_WINDOW_MOVABLE | c.NK_WINDOW_SCALABLE |
-        c.NK_WINDOW_CLOSABLE | c.NK_WINDOW_MINIMIZABLE | c.NK_WINDOW_TITLE;
-
     const Id = opaque {};
-    if (nk.window.begin(ctx, Id, "test", nk.rect(10, 10, 10, 10), flags)) |win| {
+    if (nk.window.begin(ctx, Id, nk.rect(10, 10, 10, 10), .{})) |win| {
         try std.testing.expectEqual(@as(?*const nk.Window, win), nk.window.find(ctx, Id));
     }
     nk.window.end(ctx);

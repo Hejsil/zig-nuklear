@@ -155,7 +155,7 @@ pub const chart = struct {
         var ctx = &try nk.testing.init();
         defer nk.free(ctx);
 
-        if (nk.window.begin(ctx, opaque {}, "test", nk.rect(10, 10, 10, 10), 0)) |win| {
+        if (nk.window.begin(ctx, opaque {}, nk.rect(10, 10, 10, 10), .{})) |win| {
             nk.layout.rowDynamic(ctx, 0.0, 1);
             nk.chart.plotFunction(ctx, .NK_CHART_LINES, {}, struct {
                 fn func(_: void, i: usize) f32 {
@@ -353,7 +353,7 @@ pub const combo = struct {
         var ctx = &try nk.testing.init();
         defer nk.free(ctx);
 
-        if (nk.window.begin(ctx, opaque {}, "test", nk.rect(10, 10, 10, 10), 0)) |win| {
+        if (nk.window.begin(ctx, opaque {}, nk.rect(10, 10, 10, 10), .{})) |win| {
             nk.layout.rowDynamic(ctx, 0.0, 1);
             _ = nk.combo.callback(ctx, {}, struct {
                 fn func(_: void, i: usize) []const u8 {
@@ -1129,7 +1129,6 @@ pub const CollapseStates = c.nk_collapse_states;
 pub const Color = c.struct_nk_color;
 pub const Colorf = c.struct_nk_colorf;
 pub const CommandBuffer = c.struct_nk_command_buffer;
-pub const Command = c.struct_nk_command;
 pub const Context = c.struct_nk_context;
 pub const Cursor = c.struct_nk_cursor;
 pub const CustomCallback = c.nk_command_custom_callback;
@@ -1158,6 +1157,78 @@ pub const TextEdit = c.struct_nk_text_edit;
 pub const UserFont = c.struct_nk_user_font;
 pub const Vec2 = c.struct_nk_vec2;
 pub const Window = c.struct_nk_window;
+
+pub const Command = union(enum) {
+    scissor: *const c.struct_nk_command_scissor,
+    line: *const c.struct_nk_command_line,
+    curve: *const c.struct_nk_command_curve,
+    rect: *const c.struct_nk_command_rect,
+    rect_filled: *const c.struct_nk_command_rect_filled,
+    rect_multi_color: *const c.struct_nk_command_rect_multi_color,
+    circle: *const c.struct_nk_command_circle,
+    circle_filled: *const c.struct_nk_command_circle_filled,
+    arc: *const c.struct_nk_command_arc,
+    arc_filled: *const c.struct_nk_command_arc_filled,
+    triangle: *const c.struct_nk_command_triangle,
+    triangle_filled: *const c.struct_nk_command_triangle_filled,
+    polygon: *const c.struct_nk_command_polygon,
+    polygon_filled: *const c.struct_nk_command_polygon_filled,
+    polyline: *const c.struct_nk_command_polyline,
+    text: *const c.struct_nk_command_text,
+    image: *const c.struct_nk_command_image,
+    custom: *const c.struct_nk_command,
+
+    pub fn fromNuklear(cmd: *const c.struct_nk_command) Command {
+        switch (cmd.type) {
+            .NK_COMMAND_SCISSOR => return .{ .scissor = @ptrCast(*const c.struct_nk_command_scissor, cmd) },
+            .NK_COMMAND_LINE => return .{ .line = @ptrCast(*const c.struct_nk_command_line, cmd) },
+            .NK_COMMAND_CURVE => return .{ .curve = @ptrCast(*const c.struct_nk_command_curve, cmd) },
+            .NK_COMMAND_RECT => return .{ .rect = @ptrCast(*const c.struct_nk_command_rect, cmd) },
+            .NK_COMMAND_RECT_FILLED => return .{ .rect_filled = @ptrCast(*const c.struct_nk_command_rect_filled, cmd) },
+            .NK_COMMAND_RECT_MULTI_COLOR => return .{ .rect_multi_color = @ptrCast(*const c.struct_nk_command_rect_multi_color, cmd) },
+            .NK_COMMAND_CIRCLE => return .{ .circle = @ptrCast(*const c.struct_nk_command_circle, cmd) },
+            .NK_COMMAND_CIRCLE_FILLED => return .{ .circle_filled = @ptrCast(*const c.struct_nk_command_circle_filled, cmd) },
+            .NK_COMMAND_ARC => return .{ .arc = @ptrCast(*const c.struct_nk_command_arc, cmd) },
+            .NK_COMMAND_ARC_FILLED => return .{ .arc_filled = @ptrCast(*const c.struct_nk_command_arc_filled, cmd) },
+            .NK_COMMAND_TRIANGLE => return .{ .triangle = @ptrCast(*const c.struct_nk_command_triangle, cmd) },
+            .NK_COMMAND_TRIANGLE_FILLED => return .{ .triangle_filled = @ptrCast(*const c.struct_nk_command_triangle_filled, cmd) },
+            .NK_COMMAND_POLYGON => return .{ .polygon = @ptrCast(*const c.struct_nk_command_polygon, cmd) },
+            .NK_COMMAND_POLYGON_FILLED => return .{ .polygon_filled = @ptrCast(*const c.struct_nk_command_polygon_filled, cmd) },
+            .NK_COMMAND_POLYLINE => return .{ .polyline = @ptrCast(*const c.struct_nk_command_polyline, cmd) },
+            .NK_COMMAND_TEXT => return .{ .text = @ptrCast(*const c.struct_nk_command_text, cmd) },
+            .NK_COMMAND_IMAGE => return .{ .image = @ptrCast(*const c.struct_nk_command_image, cmd) },
+            .NK_COMMAND_CUSTOM => return .{ .custom = cmd },
+            .NK_COMMAND_NOP => unreachable,
+            _ => unreachable,
+        }
+    }
+};
+
+pub const PanelFlags = struct {
+    title: ?[]const u8 = null,
+    border: bool = false,
+    moveable: bool = false,
+    scalable: bool = false,
+    closable: bool = false,
+    minimizable: bool = false,
+    scrollbar: bool = true,
+    scroll_auto_hide: bool = false,
+    background: bool = false,
+    input: bool = true,
+
+    pub fn toNuklear(flags: PanelFlags) nk.Flags {
+        return @intCast(nk.Flags, (if (flags.title) |_| c.NK_WINDOW_TITLE else 0) |
+            (if (flags.border) c.NK_WINDOW_BORDER else 0) |
+            (if (flags.moveable) c.NK_WINDOW_MOVABLE else 0) |
+            (if (flags.scalable) c.NK_WINDOW_SCALABLE else 0) |
+            (if (flags.closable) c.NK_WINDOW_CLOSABLE else 0) |
+            (if (flags.minimizable) c.NK_WINDOW_MINIMIZABLE else 0) |
+            (if (!flags.scrollbar) c.NK_WINDOW_NO_SCROLLBAR else 0) |
+            (if (flags.scroll_auto_hide) c.NK_WINDOW_SCROLL_AUTO_HIDE else 0) |
+            (if (flags.background) c.NK_WINDOW_BACKGROUND else 0) |
+            (if (!flags.input) c.NK_WINDOW_NO_INPUT else 0));
+    }
+};
 
 pub const ScrollOffset = struct {
     x: usize,
@@ -1191,13 +1262,24 @@ pub fn free(ctx: *Context) void {
     c.nk_free(ctx);
 }
 
-pub fn begin(ctx: *Context) ?*const Command {
-    return c.nk__begin(ctx);
+pub fn iterator(ctx: *Context) Iterator {
+    return .{ .ctx = ctx };
 }
 
-pub fn next(ctx: *Context, prev: ?*const Command) ?*const Command {
-    return c.nk__next(ctx, prev);
-}
+pub const Iterator = struct {
+    ctx: *Context,
+    prev: ?*const c.struct_nk_command = null,
+
+    pub fn next(it: *Iterator) ?Command {
+        const res = if (it.prev) |p|
+            c.nk__next(it.ctx, p)
+        else
+            c.nk__begin(it.ctx) orelse return null;
+
+        defer it.prev = res;
+        return Command.fromNuklear(res);
+    }
+};
 
 pub fn slice(s: []const u8) Slice {
     return .{
