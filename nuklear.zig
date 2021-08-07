@@ -31,6 +31,8 @@ pub const tree = @import("src/tree.zig");
 pub const widget = @import("src/widget.zig");
 pub const window = @import("src/window.zig");
 
+pub const utf_size = c.NK_UTF_SIZE;
+
 pub const property = struct {
     pub fn int(ctx: *nk.Context, name: []const u8, min: c_int, val: *c_int, max: c_int, step: c_int, inc_per_pixel: f32) void {
         return c.nk_property_int(ctx, nk.slice(name), min, val, max, step, inc_per_pixel);

@@ -116,7 +116,7 @@ test {
     testing.refAllDecls(@This());
 }
 
-test "list" {
+test "group" {
     var ctx = &try nk.testing.init();
     defer nk.free(ctx);
 
