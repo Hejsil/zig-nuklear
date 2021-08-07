@@ -31,6 +31,8 @@ pub const tree = @import("src/tree.zig");
 pub const widget = @import("src/widget.zig");
 pub const window = @import("src/window.zig");
 
+pub const NK_UTF_SIZE = c.NK_UTF_SIZE;
+
 pub const property = struct {
     pub fn int(ctx: *nk.Context, name: []const u8, min: c_int, val: *c_int, max: c_int, step: c_int, inc_per_pixel: f32) void {
         return c.nk_property_int(ctx, nk.slice(name), min, val, max, step, inc_per_pixel);
@@ -1177,7 +1179,7 @@ pub const Command = union(enum) {
     text: *const c.struct_nk_command_text,
     image: *const c.struct_nk_command_image,
     custom: *const c.struct_nk_command,
-
+    
     pub fn fromNuklear(cmd: *const c.struct_nk_command) Command {
         switch (cmd.type) {
             .NK_COMMAND_SCISSOR => return .{ .scissor = @ptrCast(*const c.struct_nk_command_scissor, cmd) },
@@ -1277,6 +1279,9 @@ pub const Iterator = struct {
             c.nk__begin(it.ctx) orelse return null;
 
         defer it.prev = res;
+        if (res == null) {
+            return null;
+        }
         return Command.fromNuklear(res);
     }
 };
