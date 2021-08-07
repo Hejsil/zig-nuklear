@@ -1271,10 +1271,10 @@ pub const Iterator = struct {
     prev: ?*const c.struct_nk_command = null,
 
     pub fn next(it: *Iterator) ?Command {
-        const res = if (it.prev) |p|
+        const res = (if (it.prev) |p|
             c.nk__next(it.ctx, p)
         else
-            c.nk__begin(it.ctx) orelse return null;
+            c.nk__begin(it.ctx)) orelse return null;
 
         defer it.prev = res;
         return Command.fromNuklear(res);
@@ -1337,25 +1337,28 @@ const heap = struct {
     };
 
     fn alloc(handle: Handle, m_old: ?*c_void, n: c.nk_size) callconv(.C) ?*c_void {
-        const old = if (@ptrCast(?[*]u8, m_old)) |old| blk: {
+        const al = alignPtrCast(*mem.Allocator, handle.ptr);
+
+        const res = if (@ptrCast(?[*]u8, m_old)) |old| blk: {
             const old_with_header = old - header_size;
             const header = alignPtrCast([*]Header, old_with_header)[0];
 
-            break :blk old_with_header[0 .. header_size + header.size];
-        } else &[_]u8{};
+            const old_mem = old_with_header[0 .. header_size + header.size];
+            if (al.resize(old_mem, n + header_size)) |resized| {
+                break :blk resized;
+            } else |_| {}
 
-        if (n == 0) {
-            free(handle, m_old);
-            return null;
-        }
-
-        const al = alignPtrCast(*mem.Allocator, handle.ptr);
-        const res = al.reallocAdvanced(old, header_align, n + header_size, .exact) catch
-            return null;
+            // Resize failed. Give the caller new memory instead
+            break :blk al.allocAdvanced(u8, header_align, n + header_size, .exact) catch
+                return null;
+        } else blk: {
+            break :blk al.allocAdvanced(u8, header_align, n + header_size, .exact) catch
+                return null;
+        };
 
         // Store the size of the allocation in the extra memory we allocated, and return
         // a pointer after the header.
-        @ptrCast([*]Header, res.ptr)[0] = .{ .size = n };
+        alignPtrCast([*]Header, res.ptr)[0] = .{ .size = n };
         return @ptrCast(*c_void, res[header_size..].ptr);
     }
 
