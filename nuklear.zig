@@ -31,6 +31,9 @@ pub const tree = @import("src/tree.zig");
 pub const widget = @import("src/widget.zig");
 pub const window = @import("src/window.zig");
 
+pub const Buffer = @import("src/Buffer.zig");
+pub const Str = @import("src/Str.zig");
+
 pub const utf_size = c.NK_UTF_SIZE;
 
 pub const property = struct {
@@ -423,6 +426,7 @@ pub const menubar = struct {
     pub fn begin(ctx: *nk.Context) void {
         return c.nk_menubar_begin(ctx);
     }
+
     pub fn end(ctx: *nk.Context) void {
         return c.nk_menubar_end(ctx);
     }
@@ -538,6 +542,18 @@ pub const style = struct {
 
     pub fn popFont(ctx: *nk.Context) bool {
         return c.nk_style_pop_font(ctx) != 0;
+    }
+
+    pub fn itemImage(img: nk.Image) nk.StyleItem {
+        return c.nk_style_item_image(img);
+    }
+
+    pub fn itemColor(y: nk.Color) nk.StyleItem {
+        return c.nk_style_item_color(y);
+    }
+
+    pub fn itemHide() nk.StyleItem {
+        return c.nk_style_item_hide();
     }
 
     test {
@@ -686,50 +702,41 @@ pub const rest = struct {
         std.testing.refAllDecls(@This());
     }
 
-    pub fn nkRgb(r: c_int, g: c_int, b: c_int) nk.Color {
-        return c.nk_rgb(r, g, b);
+    pub fn nkRgbIv(_rgb: [*c]const c_int) nk.Color {
+        return c.nk_rgb_iv(_rgb);
     }
-    pub fn nkRgbIv(rgb: [*c]const c_int) nk.Color {
-        return c.nk_rgb_iv(rgb);
+    pub fn nkRgbBv(_rgb: [*c]const u8) nk.Color {
+        return c.nk_rgb_bv(_rgb);
     }
-    pub fn nkRgbBv(rgb: [*c]const u8) nk.Color {
-        return c.nk_rgb_bv(rgb);
-    }
-    pub fn nkRgbF(r: f32, g: f32, b: f32) nk.Color {
-        return c.nk_rgb_f(r, g, b);
-    }
-    pub fn nkRgbFv(rgb: [*c]const f32) nk.Color {
-        return c.nk_rgb_fv(rgb);
+    pub fn nkRgbFv(_rgb: [*c]const f32) nk.Color {
+        return c.nk_rgb_fv(_rgb);
     }
     pub fn nkRgbCf(y: nk.Colorf) nk.Color {
         return c.nk_rgb_cf(y);
     }
-    pub fn nkRgbHex(rgb: []const u8) nk.Color {
-        return c.nk_rgb_hex(nk.slice(rgb));
-    }
-    pub fn nkRgba(r: c_int, g: c_int, b: c_int, a: c_int) nk.Color {
-        return c.nk_rgba(r, g, b, a);
+    pub fn nkRgbHex(_rgb: []const u8) nk.Color {
+        return c.nk_rgb_hex(nk.slice(_rgb));
     }
     pub fn nkRgbaU32(i: c_uint) nk.Color {
         return c.nk_rgba_u32(i);
     }
-    pub fn nkRgbaIv(rgba: [*c]const c_int) nk.Color {
-        return c.nk_rgba_iv(rgba);
+    pub fn nkRgbaIv(_rgba: [*c]const c_int) nk.Color {
+        return c.nk_rgba_iv(_rgba);
     }
-    pub fn nkRgbaBv(rgba: [*c]const u8) nk.Color {
-        return c.nk_rgba_bv(rgba);
+    pub fn nkRgbaBv(_rgba: [*c]const u8) nk.Color {
+        return c.nk_rgba_bv(_rgba);
     }
     pub fn nkRgbaF(r: f32, g: f32, b: f32, a: f32) nk.Color {
         return c.nk_rgba_f(r, g, b, a);
     }
-    pub fn nkRgbaFv(rgba: [*c]const f32) nk.Color {
-        return c.nk_rgba_fv(rgba);
+    pub fn nkRgbaFv(_rgba: [*c]const f32) nk.Color {
+        return c.nk_rgba_fv(_rgba);
     }
     pub fn nkRgbaCf(y: nk.Colorf) nk.Color {
         return c.nk_rgba_cf(y);
     }
-    pub fn nkRgbaHex(rgb: []const u8) nk.Color {
-        return c.nk_rgba_hex(nk.slice(rgb));
+    pub fn nkRgbaHex(_rgb: []const u8) nk.Color {
+        return c.nk_rgba_hex(nk.slice(_rgb));
     }
     pub fn nkHsvaColorf(h: f32, s: f32, v: f32, a: f32) nk.Colorf {
         return c.nk_hsva_colorf(h, s, v, a);
@@ -740,38 +747,26 @@ pub const rest = struct {
     pub fn nkColorfHsvaF(out_h: [*c]f32, out_s: [*c]f32, out_v: [*c]f32, out_a: [*c]f32, in: nk.Colorf) void {
         return c.nk_colorf_hsva_f(out_h, out_s, out_v, out_a, in);
     }
-    pub fn nkColorfHsvaFv(hsva: [*c]f32, in: nk.Colorf) void {
-        return c.nk_colorf_hsva_fv(hsva, in);
+    pub fn nkColorfHsvaFv(_hsva: [*c]f32, in: nk.Colorf) void {
+        return c.nk_colorf_hsva_fv(_hsva, in);
     }
-    pub fn nkHsv(h: c_int, s: c_int, v: c_int) nk.Color {
-        return c.nk_hsv(h, s, v);
+    pub fn nkHsvIv(_hsv: [*c]const c_int) nk.Color {
+        return c.nk_hsv_iv(_hsv);
     }
-    pub fn nkHsvIv(hsv: [*c]const c_int) nk.Color {
-        return c.nk_hsv_iv(hsv);
+    pub fn nkHsvBv(_hsv: [*c]const u8) nk.Color {
+        return c.nk_hsv_bv(_hsv);
     }
-    pub fn nkHsvBv(hsv: [*c]const u8) nk.Color {
-        return c.nk_hsv_bv(hsv);
+    pub fn nkHsvFv(_hsv: [*c]const f32) nk.Color {
+        return c.nk_hsv_fv(_hsv);
     }
-    pub fn nkHsvF(h: f32, s: f32, v: f32) nk.Color {
-        return c.nk_hsv_f(h, s, v);
+    pub fn nkHsvaIv(_hsva: [*c]const c_int) nk.Color {
+        return c.nk_hsva_iv(_hsva);
     }
-    pub fn nkHsvFv(hsv: [*c]const f32) nk.Color {
-        return c.nk_hsv_fv(hsv);
+    pub fn nkHsvaBv(_hsva: [*c]const u8) nk.Color {
+        return c.nk_hsva_bv(_hsva);
     }
-    pub fn nkHsva(h: c_int, s: c_int, v: c_int, a: c_int) nk.Color {
-        return c.nk_hsva(h, s, v, a);
-    }
-    pub fn nkHsvaIv(hsva: [*c]const c_int) nk.Color {
-        return c.nk_hsva_iv(hsva);
-    }
-    pub fn nkHsvaBv(hsva: [*c]const u8) nk.Color {
-        return c.nk_hsva_bv(hsva);
-    }
-    pub fn nkHsvaF(h: f32, s: f32, v: f32, a: f32) nk.Color {
-        return c.nk_hsva_f(h, s, v, a);
-    }
-    pub fn nkHsvaFv(hsva: [*c]const f32) nk.Color {
-        return c.nk_hsva_fv(hsva);
+    pub fn nkHsvaFv(_hsva: [*c]const f32) nk.Color {
+        return c.nk_hsva_fv(_hsva);
     }
     pub fn nkColorF(r: [*c]f32, g: [*c]f32, b: [*c]f32, a: [*c]f32, u: nk.Color) void {
         return c.nk_color_f(r, g, b, a, u);
@@ -787,9 +782,6 @@ pub const rest = struct {
     }
     pub fn nkColorDv(rgba_out: [*c]f64, u: nk.Color) void {
         return c.nk_color_dv(rgba_out, u);
-    }
-    pub fn nkColorU32(y: nk.Color) c.nk_uint {
-        return c.nk_color_u32(y);
     }
     pub fn nkColorHexRgba(output: [*c]u8, u: nk.Color) void {
         return c.nk_color_hex_rgba(output, u);
@@ -833,6 +825,9 @@ pub const rest = struct {
     pub fn nkColorHsvaFv(hsva_out: [*c]f32, u: nk.Color) void {
         return c.nk_color_hsva_fv(hsva_out, u);
     }
+
+    //
+
     pub fn nkHandlePtr(ptr: ?*c_void) nk.Handle {
         return c.nk_handle_ptr(ptr);
     }
@@ -866,42 +861,12 @@ pub const rest = struct {
     pub fn nkTriangleFromDirection(result: [*c]nk.Vec2, r: nk.Rect, pad_x: f32, pad_y: f32, u: nk.Heading) void {
         return c.nk_triangle_from_direction(result, r, pad_x, pad_y, u);
     }
-    pub fn nkVec2(x: f32, y: f32) nk.Vec2 {
-        return c.nk_vec2(x, y);
-    }
-    pub fn nkVec2i(x: c_int, y: c_int) nk.Vec2 {
-        return c.nk_vec2i(x, y);
-    }
-    pub fn nkVec2v(xy: [*c]const f32) nk.Vec2 {
-        return c.nk_vec2v(xy);
-    }
-    pub fn nkVec2iv(xy: [*c]const c_int) nk.Vec2 {
-        return c.nk_vec2iv(xy);
-    }
     pub fn nkGetNullRect() nk.Rect {
         return c.nk_get_null_rect();
     }
-    pub fn nkRect(x: f32, y: f32, w: f32, h: f32) nk.Rect {
-        return c.nk_rect(x, y, w, h);
-    }
-    pub fn nkRecti(x: c_int, y: c_int, w: c_int, h: c_int) nk.Rect {
-        return c.nk_recti(x, y, w, h);
-    }
-    pub fn nkRecta(pos: nk.Vec2, size: nk.Vec2) nk.Rect {
-        return c.nk_recta(pos, size);
-    }
-    pub fn nkRectv(xywh: [*c]const f32) nk.Rect {
-        return c.nk_rectv(xywh);
-    }
-    pub fn nkRectiv(xywh: [*c]const c_int) nk.Rect {
-        return c.nk_rectiv(xywh);
-    }
-    pub fn nkRectPos(r: nk.Rect) nk.Vec2 {
-        return c.nk_rect_pos(r);
-    }
-    pub fn nkRectSize(r: nk.Rect) nk.Vec2 {
-        return c.nk_rect_size(r);
-    }
+
+    //
+
     pub fn nkFontDefaultGlyphRanges() [*c]const nk.Rune {
         return c.nk_font_default_glyph_ranges();
     }
@@ -914,107 +879,9 @@ pub const rest = struct {
     pub fn nkFontKoreanGlyphRanges() [*c]const nk.Rune {
         return c.nk_font_korean_glyph_ranges();
     }
-    pub fn nkBufferInit(b: [*c]nk.Buffer, a: [*c]const nk.Allocator, size: usize) void {
-        return c.nk_buffer_init(b, a, size);
-    }
-    pub fn nkBufferInitFixed(b: [*c]nk.Buffer, memory: ?*c_void, size: usize) void {
-        return c.nk_buffer_init_fixed(b, memory, size);
-    }
-    pub fn nkBufferInfo(m: [*c]nk.MemoryStatus, b: [*c]nk.Buffer) void {
-        return c.nk_buffer_info(m, b);
-    }
-    pub fn nkBufferPush(b: [*c]nk.Buffer, t: nk.BufferAllocatorType, memory: ?*const c_void, size: usize, @"align": usize) void {
-        return c.nk_buffer_push(b, t, memory, size, @"align");
-    }
-    pub fn nkBufferMark(b: [*c]nk.Buffer, t: nk.BufferAllocatorType) void {
-        return c.nk_buffer_mark(b, t);
-    }
-    pub fn nkBufferReset(b: [*c]nk.Buffer, t: nk.BufferAllocatorType) void {
-        return c.nk_buffer_reset(b, t);
-    }
-    pub fn nkBufferClear(b: [*c]nk.Buffer) void {
-        return c.nk_buffer_clear(b);
-    }
-    pub fn nkBufferFree(b: [*c]nk.Buffer) void {
-        return c.nk_buffer_free(b);
-    }
-    pub fn nkBufferMemory(b: [*c]nk.Buffer) ?*c_void {
-        return c.nk_buffer_memory(b);
-    }
-    pub fn nkBufferMemoryConst(b: [*c]const nk.Buffer) ?*const c_void {
-        return c.nk_buffer_memory_const(b);
-    }
-    pub fn nkBufferTotal(b: [*c]nk.Buffer) usize {
-        return c.nk_buffer_total(b);
-    }
-    pub fn nkStrInit(s: [*c]nk.String, a: [*c]const nk.Allocator, size: usize) void {
-        return c.nk_str_init(s, a, size);
-    }
-    pub fn nkStrInitFixed(s: [*c]nk.String, memory: ?*c_void, size: usize) void {
-        return c.nk_str_init_fixed(s, memory, size);
-    }
-    pub fn nkStrClear(s: [*c]nk.String) void {
-        return c.nk_str_clear(s);
-    }
-    pub fn nkStrFree(s: [*c]nk.String) void {
-        return c.nk_str_free(s);
-    }
-    pub fn nkStrAppendStrChar(s: [*c]nk.String, t: []const u8) c_int {
-        return c.nk_str_append_str_char(s, nk.slice(t));
-    }
-    pub fn nkStrAppendStrRunes(s: [*c]nk.String, runes: [*c]const nk.Rune, len: usize) c_int {
-        return c.nk_str_append_str_runes(s, runes, len);
-    }
-    pub fn nkStrInsertAtChar(s: [*c]nk.String, pos: c_int, t: []const u8) c_int {
-        return c.nk_str_insert_at_char(s, pos, nk.slice(t));
-    }
-    pub fn nkStrInsertAtRune(s: [*c]nk.String, pos: c_int, t: []const u8) c_int {
-        return c.nk_str_insert_at_rune(s, pos, nk.slice(t));
-    }
-    pub fn nkStrInsertTextRunes(s: [*c]nk.String, pos: c_int, a: [*c]const nk.Rune, u: c_int) c_int {
-        return c.nk_str_insert_text_runes(s, pos, a, u);
-    }
-    pub fn nkStrInsertStrRunes(s: [*c]nk.String, pos: c_int, a: [*c]const nk.Rune) c_int {
-        return c.nk_str_insert_str_runes(s, pos, a);
-    }
-    pub fn nkStrRemoveChars(s: [*c]nk.String, len: c_int) void {
-        return c.nk_str_remove_chars(s, len);
-    }
-    pub fn nkStrRemoveRunes(s: [*c]nk.String, len: c_int) void {
-        return c.nk_str_remove_runes(s, len);
-    }
-    pub fn nkStrDeleteChars(s: [*c]nk.String, pos: c_int, len: c_int) void {
-        return c.nk_str_delete_chars(s, pos, len);
-    }
-    pub fn nkStrDeleteRunes(s: [*c]nk.String, pos: c_int, len: c_int) void {
-        return c.nk_str_delete_runes(s, pos, len);
-    }
-    pub fn nkStrAtChar(s: [*c]nk.String, pos: c_int) [*c]u8 {
-        return c.nk_str_at_char(s, pos);
-    }
-    pub fn nkStrAtRune(s: [*c]nk.String, pos: c_int, unicode: [*c]nk.Rune, len: [*c]c_int) [*c]u8 {
-        return c.nk_str_at_rune(s, pos, unicode, len);
-    }
-    pub fn nkStrRuneAt(s: [*c]const nk.String, pos: c_int) nk.Rune {
-        return c.nk_str_rune_at(s, pos);
-    }
-    pub fn nkStrAtCharConst(s: [*c]const nk.String, pos: c_int) [*c]const u8 {
-        return c.nk_str_at_char_const(s, pos);
-    }
-    pub fn nkStrAtConst(s: [*c]const nk.String, pos: c_int, unicode: [*c]nk.Rune) []const u8 {
-        const res = c.nk_str_at_const(s, pos, unicode);
-        return res.ptr[0..res.len];
-    }
-    pub fn nkStrGet(s: [*c]nk.String) [*c]u8 {
-        return c.nk_str_get(s);
-    }
-    pub fn nkStrGetConst(s: [*c]const nk.String) []const u8 {
-        const res = c.nk_str_get_const(s);
-        return res.ptr[0..res.len];
-    }
-    pub fn nkStrLen(s: [*c]nk.String) c_int {
-        return c.nk_str_len(s);
-    }
+
+    //
+
     pub fn nkFilterDefault(t: [*c]const nk.TextEdit, unicode: nk.Rune) bool {
         return c.nk_filter_default(t, unicode) != 0;
     }
@@ -1036,6 +903,9 @@ pub const rest = struct {
     pub fn nkFilterBinary(t: [*c]const nk.TextEdit, unicode: nk.Rune) bool {
         return c.nk_filter_binary(t, unicode) != 0;
     }
+
+    //
+
     pub fn nkFillRect(b: [*c]nk.CommandBuffer, r: nk.Rect, rounding: f32, u: nk.Color) void {
         return c.nk_fill_rect(b, r, rounding, u);
     }
@@ -1054,77 +924,30 @@ pub const rest = struct {
     pub fn nkFillPolygon(b: [*c]nk.CommandBuffer, a: [*c]f32, point_count: c_int, u: nk.Color) void {
         return c.nk_fill_polygon(b, a, point_count, u);
     }
+
+    //
+
     pub fn nkDrawImage(b: [*c]nk.CommandBuffer, r: nk.Rect, y: [*c]const nk.Image, a: nk.Color) void {
         return c.nk_draw_image(b, r, y, a);
     }
     pub fn nkDrawText(b: [*c]nk.CommandBuffer, r: nk.Rect, t: []const u8, d: [*c]const nk.UserFont, y: nk.Color, q: nk.Color) void {
         return c.nk_draw_text(b, r, nk.slice(t), d, y, q);
     }
+
+    //
+
     pub fn nkPushScissor(b: [*c]nk.CommandBuffer, r: nk.Rect) void {
         return c.nk_push_scissor(b, r);
     }
     pub fn nkPushCustom(b: [*c]nk.CommandBuffer, r: nk.Rect, a: nk.CustomCallback, usr: nk.Handle) void {
         return c.nk_push_custom(b, r, a, usr);
     }
-    pub fn nkInputHasMouseClick(in: *const nk.Input, bots: nk.Buttons) bool {
-        return c.nk_input_has_mouse_click(in, bots) != 0;
-    }
-    pub fn nkInputHasMouseClickInRect(in: *const nk.Input, bots: nk.Buttons, r: nk.Rect) bool {
-        return c.nk_input_has_mouse_click_in_rect(in, bots, r) != 0;
-    }
-    pub fn nkInputHasMouseClickDownInRect(in: *const nk.Input, bots: nk.Buttons, r: nk.Rect, down: bool) bool {
-        return c.nk_input_has_mouse_click_down_in_rect(in, bots, r, @boolToInt(down)) != 0;
-    }
-    pub fn nkInputIsMouseClickInRect(in: *const nk.Input, bots: nk.Buttons, r: nk.Rect) bool {
-        return c.nk_input_is_mouse_click_in_rect(in, bots, r) != 0;
-    }
-    pub fn nkInputIsMouseClickDownInRect(in: *const nk.Input, id: nk.Buttons, b: nk.Rect, down: bool) bool {
-        return c.nk_input_is_mouse_click_down_in_rect(in, id, b, @boolToInt(down)) != 0;
-    }
-    pub fn nkInputAnyMouseClickInRect(in: *const nk.Input, r: nk.Rect) bool {
-        return c.nk_input_any_mouse_click_in_rect(in, r) != 0;
-    }
-    pub fn nkInputIsMousePrevHoveringRect(in: *const nk.Input, r: nk.Rect) bool {
-        return c.nk_input_is_mouse_prev_hovering_rect(in, r) != 0;
-    }
-    pub fn nkInputIsMouseHoveringRect(in: *const nk.Input, r: nk.Rect) bool {
-        return c.nk_input_is_mouse_hovering_rect(in, r) != 0;
-    }
-    pub fn nkInputMouseClicked(in: *const nk.Input, bots: nk.Buttons, r: nk.Rect) bool {
-        return c.nk_input_mouse_clicked(in, bots, r) != 0;
-    }
-    pub fn nkInputIsMouseDown(in: *const nk.Input, bots: nk.Buttons) bool {
-        return c.nk_input_is_mouse_down(in, bots) != 0;
-    }
-    pub fn nkInputIsMousePressed(in: *const nk.Input, bots: nk.Buttons) bool {
-        return c.nk_input_is_mouse_pressed(in, bots) != 0;
-    }
-    pub fn nkInputIsMouseReleased(in: *const nk.Input, bots: nk.Buttons) bool {
-        return c.nk_input_is_mouse_released(in, bots) != 0;
-    }
-    pub fn nkInputIsKeyPressed(in: *const nk.Input, keys: nk.Keys) bool {
-        return c.nk_input_is_key_pressed(in, keys) != 0;
-    }
-    pub fn nkInputIsKeyReleased(in: *const nk.Input, keys: nk.Keys) bool {
-        return c.nk_input_is_key_released(in, keys) != 0;
-    }
-    pub fn nkInputIsKeyDown(in: *const nk.Input, keys: nk.Keys) bool {
-        return c.nk_input_is_key_down(in, keys) != 0;
-    }
-    pub fn nkStyleItemImage(img: nk.Image) nk.StyleItem {
-        return c.nk_style_item_image(img);
-    }
-    pub fn nkStyleItemColor(y: nk.Color) nk.StyleItem {
-        return c.nk_style_item_color(y);
-    }
-    pub fn nkStyleItemHide() nk.StyleItem {
-        return c.nk_style_item_hide();
-    }
+
+    //
 };
 
 pub const Allocator = c.struct_nk_allocator;
 pub const BufferAllocatorType = c.enum_nk_buffer_allocation_type;
-pub const Buffer = c.struct_nk_buffer;
 pub const Buttons = c.nk_buttons;
 pub const ChartType = c.enum_nk_chart_type;
 pub const CollapseStates = c.nk_collapse_states;
@@ -1149,7 +972,6 @@ pub const Rect = c.struct_nk_rect;
 pub const Rune = c.nk_rune;
 pub const Scroll = c.struct_nk_scroll;
 pub const Slice = c.struct_nk_slice;
-pub const String = c.struct_nk_str;
 pub const StyleButton = c.struct_nk_style_button;
 pub const StyleColors = c.enum_nk_style_colors;
 pub const StyleCursor = c.enum_nk_style_cursor;
@@ -1299,11 +1121,47 @@ pub fn vec2(x: f32, y: f32) Vec2 {
     return .{ .x = x, .y = y, ._pad = undefined, ._pad2 = undefined };
 }
 
+pub fn rgb(r: u8, g: u8, b: u8) nk.Color {
+    return rgba(r, g, b, 255);
+}
+
+pub fn rgba(r: u8, g: u8, b: u8, a: u8) nk.Color {
+    return c.nk_rgba(r, g, b, a);
+}
+
+pub fn rgbf(r: f32, g: f32, b: f32) nk.Color {
+    return c.nk_rgb_f(r, g, b);
+}
+
+pub fn rgbaf(r: f32, g: f32, b: f32, a: f32) nk.Color {
+    return c.nk_rgba_f(r, g, b, a);
+}
+
+pub fn hsv(h: u8, s: u8, v: u8) nk.Color {
+    return hsva(h, s, v, 255);
+}
+
+pub fn hsva(h: u8, s: u8, v: u8, a: u8) nk.Color {
+    return c.nk_hsva(h, s, v, a);
+}
+
+pub fn hsvf(h: f32, s: f32, v: f32) nk.Color {
+    return c.nk_hsv_f(h, s, v);
+}
+
+pub fn hsvaf(h: f32, s: f32, v: f32, a: f32) nk.Color {
+    return c.nk_hsva_f(h, s, v, a);
+}
+
+pub fn colorToU32(y: nk.Color) u32 {
+    return @intCast(u32, c.nk_color_u32(y));
+}
+
 pub fn typeId(comptime T: type) usize {
-    // We generate a completly unique id by declaring a global variable `id`, and storing
-    // the address if `id` in itself.
+    // We generate a completly unique id by declaring a global variable `id` and taking
+    // the address of that variable.
     const Id = struct {
-        var addr: u8 = undefined;
+        var addr: u8 = 0;
     };
     return @ptrToInt(&Id.addr);
 }
@@ -1322,9 +1180,15 @@ fn DiscardConst(comptime Ptr: type) type {
     return @Type(info);
 }
 
-fn discardConst(ptr: anytype) DiscardConst(@TypeOf(ptr)) {
+pub fn discardConst(ptr: anytype) DiscardConst(@TypeOf(ptr)) {
     const Res = DiscardConst(@TypeOf(ptr));
-    return @intToPtr(Res, @ptrToInt(ptr));
+    switch (@typeInfo(Res).Pointer.size) {
+        .Slice => {
+            const res = discardConst(ptr.ptr);
+            return res[0..ptr.len];
+        },
+        else => return @intToPtr(Res, @ptrToInt(ptr)),
+    }
 }
 
 const heap = struct {

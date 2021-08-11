@@ -45,6 +45,66 @@ pub fn end(ctx: *nk.Context) void {
     c.nk_input_end(ctx);
 }
 
+pub fn hasMouseClick(in: nk.Input, bots: nk.Buttons) bool {
+    return c.nk_input_has_mouse_click(&in, bots) != 0;
+}
+
+pub fn hasMouseClickInRect(in: nk.Input, bots: nk.Buttons, r: nk.Rect) bool {
+    return c.nk_input_has_mouse_click_in_rect(&in, bots, r) != 0;
+}
+
+pub fn hasMouseClickDownInRect(in: nk.Input, bots: nk.Buttons, r: nk.Rect, down: bool) bool {
+    return c.nk_input_has_mouse_click_down_in_rect(&in, bots, r, @boolToInt(down)) != 0;
+}
+
+pub fn isMouseClickInRect(in: nk.Input, bots: nk.Buttons, r: nk.Rect) bool {
+    return c.nk_input_is_mouse_click_in_rect(&in, bots, r) != 0;
+}
+
+pub fn isMouseClickDownInRect(in: nk.Input, id: nk.Buttons, b: nk.Rect, down: bool) bool {
+    return c.nk_input_is_mouse_click_down_in_rect(&in, id, b, @boolToInt(down)) != 0;
+}
+
+pub fn anyMouseClickInRect(in: nk.Input, r: nk.Rect) bool {
+    return c.nk_input_any_mouse_click_in_rect(&in, r) != 0;
+}
+
+pub fn isMousePrevHoveringRect(in: nk.Input, r: nk.Rect) bool {
+    return c.nk_input_is_mouse_prev_hovering_rect(&in, r) != 0;
+}
+
+pub fn isMouseHoveringRect(in: nk.Input, r: nk.Rect) bool {
+    return c.nk_input_is_mouse_hovering_rect(&in, r) != 0;
+}
+
+pub fn mouseClicked(in: nk.Input, bots: nk.Buttons, r: nk.Rect) bool {
+    return c.nk_input_mouse_clicked(&in, bots, r) != 0;
+}
+
+pub fn isMouseDown(in: nk.Input, bots: nk.Buttons) bool {
+    return c.nk_input_is_mouse_down(&in, bots) != 0;
+}
+
+pub fn isMousePressed(in: nk.Input, bots: nk.Buttons) bool {
+    return c.nk_input_is_mouse_pressed(&in, bots) != 0;
+}
+
+pub fn isMouseReleased(in: nk.Input, bots: nk.Buttons) bool {
+    return c.nk_input_is_mouse_released(&in, bots) != 0;
+}
+
+pub fn isKeyPressed(in: nk.Input, keys: nk.Keys) bool {
+    return c.nk_input_is_key_pressed(&in, keys) != 0;
+}
+
+pub fn isKeyReleased(in: nk.Input, keys: nk.Keys) bool {
+    return c.nk_input_is_key_released(&in, keys) != 0;
+}
+
+pub fn isKeyDown(in: nk.Input, keys: nk.Keys) bool {
+    return c.nk_input_is_key_down(&in, keys) != 0;
+}
+
 test {
     testing.refAllDecls(@This());
 }
