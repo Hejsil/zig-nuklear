@@ -9,25 +9,21 @@ pub const Type = c.nk_tree_type;
 
 pub fn push(
     ctx: *nk.Context,
-    comptime Id: type,
     t: Type,
     title: []const u8,
     initial_state: nk.CollapseStates,
 ) bool {
-    const id = nk.typeId(Id);
-    return pushHashed(ctx, t, title, initial_state, mem.asBytes(&id), id);
+    return pushId(ctx, t, title, initial_state, 0);
 }
 
 pub fn pushId(
     ctx: *nk.Context,
-    comptime Id: type,
     t: Type,
     title: []const u8,
     initial_state: nk.CollapseStates,
     seed: usize,
 ) bool {
-    const id = nk.typeId(Id);
-    return pushHashed(ctx, t, title, initial_state, mem.asBytes(&id), seed);
+    return pushHashed(ctx, t, title, initial_state, title, seed);
 }
 
 pub fn pushHashed(
@@ -50,27 +46,23 @@ pub fn pushHashed(
 
 pub fn imagePush(
     ctx: *nk.Context,
-    comptime Id: type,
     t: Type,
     img: nk.Image,
     title: []const u8,
     initial_state: nk.CollapseStates,
 ) bool {
-    const id = nk.typeId(Id);
-    return imagePushHashed(ctx, t, img, title, initial_state, mem.asBytes(&id), id);
+    return imagePushId(ctx, t, img, title, initial_state, 0);
 }
 
 pub fn imagePushId(
     ctx: *nk.Context,
-    comptime Id: type,
     t: Type,
     img: nk.Image,
     title: []const u8,
     initial_state: nk.CollapseStates,
     seed: usize,
 ) bool {
-    const id = nk.typeId(Id);
-    return imagePushHashed(ctx, t, img, title, initial_state, mem.asBytes(&id), seed);
+    return imagePushHashed(ctx, t, img, title, initial_state, title, seed);
 }
 
 pub fn imagePushHashed(
@@ -117,27 +109,23 @@ pub fn statePop(ctx: *nk.Context) void {
 
 pub fn elementPush(
     ctx: *nk.Context,
-    comptime Id: type,
     t: Type,
     title: []const u8,
     initial_state: nk.CollapseStates,
     selected: *bool,
 ) bool {
-    const id = nk.typeId(Id);
-    return elementPushHashed(ctx, t, title, initial_state, selected, mem.asBytes(&id), id);
+    return elementPushId(ctx, t, title, initial_state, selected, 0);
 }
 
 pub fn elementPushId(
     ctx: *nk.Context,
-    comptime Id: type,
     t: Type,
     title: []const u8,
     initial_state: nk.CollapseStates,
     selected: *bool,
     seed: usize,
 ) bool {
-    const id = nk.typeId(Id);
-    return elementPushHashed(ctx, t, title, initial_state, selected, mem.asBytes(&id), seed);
+    return elementPushHashed(ctx, t, title, initial_state, selected, title, seed);
 }
 
 pub fn elementPushHashed(
@@ -164,20 +152,17 @@ pub fn elementPushHashed(
 
 pub fn elementImagePush(
     ctx: *nk.Context,
-    comptime Id: type,
     t: Type,
     img: nk.Image,
     title: []const u8,
     initial_state: nk.CollapseStates,
     selected: *bool,
 ) bool {
-    const id = nk.typeId(Id);
-    return elementImagePushHashed(ctx, t, img, title, initial_state, selected, mem.asBytes(&id), id);
+    return elementImagePushId(ctx, t, img, title, initial_state, selected, 0);
 }
 
 pub fn elementImagePushId(
     ctx: *nk.Context,
-    comptime Id: type,
     t: Type,
     img: nk.Image,
     title: []const u8,
@@ -185,8 +170,7 @@ pub fn elementImagePushId(
     selected: *bool,
     seed: usize,
 ) bool {
-    const id = nk.typeId(Id);
-    return elementImagePushHashed(ctx, t, img, title, initial_state, selected, mem.asBytes(&id), seed);
+    return elementImagePushHashed(ctx, t, img, title, initial_state, selected, title, seed);
 }
 
 pub fn elementImagePushHashed(
@@ -225,34 +209,31 @@ test "list" {
     var ctx = &try nk.testing.init();
     defer nk.free(ctx);
 
-    const flags = c.NK_WINDOW_BORDER | c.NK_WINDOW_MOVABLE | c.NK_WINDOW_SCALABLE |
-        c.NK_WINDOW_CLOSABLE | c.NK_WINDOW_MINIMIZABLE | c.NK_WINDOW_TITLE;
-
     var selected: bool = false;
-    if (nk.window.begin(ctx, opaque {}, nk.rect(10, 10, 10, 10), .{})) |win| {
+    if (nk.window.begin(ctx, &nk.id(opaque {}), nk.rect(10, 10, 10, 10), .{})) |_| {
         nk.layout.rowDynamic(ctx, 10, 1);
-        if (nk.tree.push(ctx, opaque {}, .NK_TREE_TAB, "tree", .NK_MINIMIZED)) {
+        if (nk.tree.push(ctx, .NK_TREE_TAB, "tree1", .NK_MINIMIZED)) {
             defer nk.tree.pop(ctx);
         }
-        if (nk.tree.pushId(ctx, opaque {}, .NK_TREE_TAB, "tree", .NK_MINIMIZED, 0)) {
+        if (nk.tree.pushId(ctx, .NK_TREE_TAB, "tree2", .NK_MINIMIZED, 0)) {
             defer nk.tree.pop(ctx);
         }
-        if (nk.tree.imagePush(ctx, opaque {}, .NK_TREE_TAB, undefined, "tree", .NK_MINIMIZED)) {
+        if (nk.tree.imagePush(ctx, .NK_TREE_TAB, undefined, "tree3", .NK_MINIMIZED)) {
             defer nk.tree.pop(ctx);
         }
-        if (nk.tree.imagePushId(ctx, opaque {}, .NK_TREE_TAB, undefined, "tree", .NK_MINIMIZED, 0)) {
+        if (nk.tree.imagePushId(ctx, .NK_TREE_TAB, undefined, "tree4", .NK_MINIMIZED, 0)) {
             defer nk.tree.pop(ctx);
         }
-        if (nk.tree.elementPush(ctx, opaque {}, .NK_TREE_TAB, "tree", .NK_MINIMIZED, &selected)) {
+        if (nk.tree.elementPush(ctx, .NK_TREE_TAB, "tree5", .NK_MINIMIZED, &selected)) {
             defer nk.tree.elementPop(ctx);
         }
-        if (nk.tree.elementPushId(ctx, opaque {}, .NK_TREE_TAB, "tree", .NK_MINIMIZED, &selected, 0)) {
+        if (nk.tree.elementPushId(ctx, .NK_TREE_TAB, "tree6", .NK_MINIMIZED, &selected, 0)) {
             defer nk.tree.elementPop(ctx);
         }
-        if (nk.tree.elementImagePush(ctx, opaque {}, .NK_TREE_TAB, undefined, "tree", .NK_MINIMIZED, &selected)) {
+        if (nk.tree.elementImagePush(ctx, .NK_TREE_TAB, undefined, "tree7", .NK_MINIMIZED, &selected)) {
             defer nk.tree.elementPop(ctx);
         }
-        if (nk.tree.elementImagePushId(ctx, opaque {}, .NK_TREE_TAB, undefined, "tree", .NK_MINIMIZED, &selected, 0)) {
+        if (nk.tree.elementImagePushId(ctx, .NK_TREE_TAB, undefined, "tree8", .NK_MINIMIZED, &selected, 0)) {
             defer nk.tree.elementPop(ctx);
         }
     }

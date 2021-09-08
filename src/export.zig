@@ -66,8 +66,7 @@ export fn zigNuklearSort(
     debug.assert(size == 16);
     sort.sort([16]u8, base[0..nmemb], cmp, struct {
         fn compare(ctx: Compare, a: [16]u8, b: [16]u8) bool {
-            const res = ctx(&a, &b);
-            return math.order(res, 0) == .lt;
+            return ctx(&a, &b) < 0;
         }
     }.compare);
 }

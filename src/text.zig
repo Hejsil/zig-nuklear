@@ -6,6 +6,13 @@ const mem = std.mem;
 const testing = std.testing;
 
 pub const Align = enum(u8) {
+    left = c.NK_TEXT_ALIGN_LEFT,
+    center = c.NK_TEXT_ALIGN_CENTERED,
+    right = c.NK_TEXT_ALIGN_RIGHT,
+    top = c.NK_TEXT_ALIGN_TOP,
+    mid = c.NK_TEXT_ALIGN_MIDDLE,
+    bot = c.NK_TEXT_ALIGN_BOTTOM,
+
     top_left = c.NK_TEXT_ALIGN_TOP | c.NK_TEXT_ALIGN_LEFT,
     mid_left = c.NK_TEXT_ALIGN_MIDDLE | c.NK_TEXT_ALIGN_LEFT,
     bot_left = c.NK_TEXT_ALIGN_BOTTOM | c.NK_TEXT_ALIGN_LEFT,

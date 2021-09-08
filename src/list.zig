@@ -7,12 +7,11 @@ const testing = std.testing;
 
 pub fn begin(
     ctx: *nk.Context,
-    comptime Id: type,
+    id: []const u8,
     row_height: usize,
     row_count: usize,
     flags: nk.PanelFlags,
 ) ?View {
-    const id = nk.typeId(Id);
     const h = @intCast(c_int, row_height);
     const cnt = @intCast(c_int, row_count);
 
@@ -20,7 +19,7 @@ pub fn begin(
     if (c.nk_list_view_begin(
         ctx,
         &out,
-        nk.slice(flags.title orelse mem.asBytes(&id)),
+        nk.slice(flags.title orelse id),
         flags.toNuklear(),
         h,
         cnt,
@@ -70,9 +69,9 @@ test "list" {
     var ctx = &try nk.testing.init();
     defer nk.free(ctx);
 
-    if (nk.window.begin(ctx, opaque {}, nk.rect(10, 10, 10, 10), .{})) |win| {
+    if (nk.window.begin(ctx, &nk.id(opaque {}), nk.rect(10, 10, 10, 10), .{})) |_| {
         nk.layout.rowDynamic(ctx, 10, 1);
-        if (nk.list.begin(ctx, opaque {}, 10, 10, .{})) |list| {
+        if (nk.list.begin(ctx, &nk.id(opaque {}), 10, 10, .{})) |list| {
             defer nk.list.end(list);
         }
     }

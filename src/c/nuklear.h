@@ -21,6 +21,7 @@ char *zigNuklearDtoa(char *s, double n);
 #define STBTT_sqrt(x) zigNuklearSqrt(x)
 #define STBTT_fmod(x,y) zigNuklearFmod(x,y)
 #define STBTT_cos(x) zigNuklearCos(x)
+#define STBTT_sin(x) zigNuklearSin(x)
 #define STBTT_acos(x) zigNuklearAcos(x)
 #define STBTT_fabs(x) zigNuklearFabs(x)
 #define STBTT_assert(x) zigNuklearAssert((x) != 0)
@@ -43,8 +44,9 @@ char *zigNuklearDtoa(char *s, double n);
 #define NK_MEMCPY
 #define NK_STRTOD
 
-#define NK_INCLUDE_FONT_BAKING
 #define NK_INCLUDE_DEFAULT_FONT
+#define NK_INCLUDE_FONT_BAKING
+#define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
 #define NK_ZERO_COMMAND_MEMORY
 #include "nuklear/nuklear.h"
 

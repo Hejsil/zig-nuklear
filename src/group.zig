@@ -10,23 +10,7 @@ const mem = std.mem;
 const meta = std.meta;
 const testing = std.testing;
 
-/// Same as `beginTitled` but instead of taking a `name` which the caller needs to ensure
-/// is a unique string, this function generates a unique name for each unique type passed
-/// to `id`.
-pub fn begin(
-    ctx: *nk.Context,
-    comptime Id: type,
-    flags: nk.PanelFlags,
-) bool {
-    const id = nk.typeId(Id);
-    return beginTitled(ctx, mem.asBytes(&id), flags);
-}
-
-pub fn beginTitled(
-    ctx: *nk.Context,
-    name: []const u8,
-    flags: nk.PanelFlags,
-) bool {
+pub fn begin(ctx: *nk.Context, name: []const u8, flags: nk.PanelFlags) bool {
     return c.nk_group_begin_titled(
         ctx,
         nk.slice(name),
@@ -120,9 +104,9 @@ test "group" {
     var ctx = &try nk.testing.init();
     defer nk.free(ctx);
 
-    if (nk.window.begin(ctx, opaque {}, nk.rect(10, 10, 10, 10), .{})) |win| {
+    if (nk.window.begin(ctx, &nk.id(opaque {}), nk.rect(10, 10, 10, 10), .{})) |_| {
         nk.layout.rowDynamic(ctx, 10, 1);
-        if (nk.group.begin(ctx, opaque {}, .{})) {
+        if (nk.group.begin(ctx, &nk.id(opaque {}), .{})) {
             defer nk.group.end(ctx);
         }
     }

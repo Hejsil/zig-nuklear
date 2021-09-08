@@ -1,5 +1,5 @@
-const c = @import("src/c.zig");
 const std = @import("std");
+pub const c = @import("src/c.zig");
 
 const builtin = std.builtin;
 const debug = std.debug;
@@ -12,22 +12,35 @@ const nk = @This();
 pub const atlas = @import("src/atlas.zig");
 pub const bar = @import("src/bar.zig");
 pub const button = @import("src/button.zig");
+pub const chart = @import("src/chart.zig");
 pub const checkbox = @import("src/checkbox.zig");
 pub const check = @import("src/check.zig");
 pub const color = @import("src/color.zig");
+pub const combo = @import("src/combo.zig");
+pub const contextual = @import("src/contextual.zig");
+pub const edit = @import("src/edit.zig");
 pub const group = @import("src/group.zig");
 pub const input = @import("src/input.zig");
 pub const layout = @import("src/layout.zig");
 pub const list = @import("src/list.zig");
+pub const menubar = @import("src/menubar.zig");
+pub const menu = @import("src/menu.zig");
 pub const option = @import("src/option.zig");
+pub const popup = @import("src/popup.zig");
+pub const property = @import("src/property.zig");
 pub const radio = @import("src/radio.zig");
 pub const selectable = @import("src/selectable.zig");
 pub const select = @import("src/select.zig");
 pub const slide = @import("src/slide.zig");
 pub const slider = @import("src/slider.zig");
+pub const stroke = @import("src/stroke.zig");
+pub const style = @import("src/style.zig");
 pub const testing = @import("src/testing.zig");
+pub const Text = @import("src/TextEdit.zig");
 pub const text = @import("src/text.zig");
+pub const tooltip = @import("src/tooltip.zig");
 pub const tree = @import("src/tree.zig");
+pub const vertex = @import("src/vertex.zig");
 pub const widget = @import("src/widget.zig");
 pub const window = @import("src/window.zig");
 
@@ -35,667 +48,6 @@ pub const Buffer = @import("src/Buffer.zig");
 pub const Str = @import("src/Str.zig");
 
 pub const utf_size = c.NK_UTF_SIZE;
-
-pub const property = struct {
-    pub fn int(ctx: *nk.Context, name: []const u8, min: c_int, val: *c_int, max: c_int, step: c_int, inc_per_pixel: f32) void {
-        return c.nk_property_int(ctx, nk.slice(name), min, val, max, step, inc_per_pixel);
-    }
-
-    pub fn float(ctx: *nk.Context, name: []const u8, min: f32, val: *f32, max: f32, step: f32, inc_per_pixel: f32) void {
-        return c.nk_property_float(ctx, nk.slice(name), min, val, max, step, inc_per_pixel);
-    }
-
-    pub fn double(ctx: *nk.Context, name: []const u8, min: f64, val: *f64, max: f64, step: f64, inc_per_pixel: f32) void {
-        return c.nk_property_double(ctx, nk.slice(name), min, val, max, step, inc_per_pixel);
-    }
-
-    pub fn i(ctx: *nk.Context, name: []const u8, min: c_int, val: c_int, max: c_int, step: c_int, inc_per_pixel: f32) c_int {
-        return c.nk_propertyi(ctx, nk.slice(name), min, val, max, step, inc_per_pixel);
-    }
-
-    pub fn f(ctx: *nk.Context, name: []const u8, min: f32, val: f32, max: f32, step: f32, inc_per_pixel: f32) f32 {
-        return c.nk_propertyf(ctx, nk.slice(name), min, val, max, step, inc_per_pixel);
-    }
-
-    pub fn d(ctx: *nk.Context, name: []const u8, min: f64, val: f64, max: f64, step: f64, inc_per_pixel: f32) f64 {
-        return c.nk_propertyd(ctx, nk.slice(name), min, val, max, step, inc_per_pixel);
-    }
-
-    test {
-        std.testing.refAllDecls(@This());
-    }
-};
-
-pub const edit = struct {
-    pub const Text = c.nk_text_edit;
-
-    pub fn string(ctx: *nk.Context, flags: nk.Flags, buf: *[]u8, max: usize, filter: nk.Filter) nk.Flags {
-        var c_len = @intCast(c_int, buf.len);
-        defer buf.len = @intCast(usize, c_len);
-        return c.nk_edit_string(ctx, flags, buf.ptr, &c_len, @intCast(c_int, max), filter);
-    }
-
-    pub fn stringZ(ctx: *nk.Context, flags: nk.Flags, buf: [*:0]u8, max: usize, filter: nk.Filter) nk.Flags {
-        return c.nk_edit_string_zero_terminated(ctx, flags, buf, @intCast(c_int, max), filter);
-    }
-
-    pub fn buffer(ctx: *nk.Context, flags: nk.Flags, t: *Text, filter: nk.Filter) nk.Flags {
-        return c.nk_edit_buffer(ctx, flags, t, filter);
-    }
-
-    pub fn focus(ctx: *nk.Context, flags: nk.Flags) void {
-        return c.nk_edit_focus(ctx, flags);
-    }
-
-    pub fn unfocus(ctx: *nk.Context) void {
-        return c.nk_edit_unfocus(ctx);
-    }
-
-    test {
-        std.testing.refAllDecls(@This());
-    }
-};
-
-pub const chart = struct {
-    pub fn begin(ctx: *nk.Context, a: nk.ChartType, num: usize, min: f32, max: f32) bool {
-        return c.nk_chart_begin(ctx, a, @intCast(c_int, num), min, max) != 0;
-    }
-
-    pub fn beginColored(ctx: *nk.Context, y: nk.ChartType, a: nk.Color, active: nk.Color, num: usize, min: f32, max: f32) bool {
-        return c.nk_chart_begin_colored(ctx, y, a, active, @intCast(c_int, num), min, max) != 0;
-    }
-
-    pub fn addSlot(ctx: *nk.Context, a: nk.ChartType, count: usize, min_value: f32, max_value: f32) void {
-        return c.nk_chart_add_slot(ctx, a, @intCast(c_int, count), min_value, max_value);
-    }
-
-    pub fn addSlotColored(ctx: *nk.Context, y: nk.ChartType, a: nk.Color, active: nk.Color, count: usize, min_value: f32, max_value: f32) void {
-        return c.nk_chart_add_slot_colored(ctx, y, a, active, @intCast(c_int, count), min_value, max_value);
-    }
-
-    pub fn push(ctx: *nk.Context, value: f32) nk.Flags {
-        return c.nk_chart_push(ctx, value);
-    }
-
-    pub fn pushSlot(ctx: *nk.Context, value: f32, slot: usize) nk.Flags {
-        return c.nk_chart_push_slot(ctx, value, @intCast(c_int, slot));
-    }
-
-    pub fn end(ctx: *nk.Context) void {
-        return c.nk_chart_end(ctx);
-    }
-
-    pub fn plot(ctx: *nk.Context, a: nk.ChartType, values: []const f32, offset: c_int) void {
-        return c.nk_plot(ctx, a, values.ptr, @intCast(c_int, values.len), offset);
-    }
-
-    pub fn plotFunction(ctx: *nk.Context, y: nk.ChartType, userdata: anytype, getter: fn (@TypeOf(userdata), usize) f32, count: usize, offset: usize) void {
-        const T = @TypeOf(userdata);
-        const Wrapped = struct {
-            userdata: T,
-            getter: fn (T, usize) f32,
-
-            fn valueGetter(user: ?*c_void, index: c_int) callconv(.C) f32 {
-                const casted = @ptrCast(*const @This(), @alignCast(@alignOf(@This()), user));
-                return casted.getter(casted.userdata, @intCast(usize, index));
-            }
-        };
-
-        var wrapped = Wrapped{ .userdata = userdata, .getter = getter };
-        return c.nk_plot_function(
-            ctx,
-            y,
-            @ptrCast(*c_void, &wrapped),
-            Wrapped.valueGetter,
-            @intCast(c_int, count),
-            @intCast(c_int, offset),
-        );
-    }
-
-    test {
-        std.testing.refAllDecls(@This());
-    }
-
-    test "chart" {
-        var ctx = &try nk.testing.init();
-        defer nk.free(ctx);
-
-        if (nk.window.begin(ctx, opaque {}, nk.rect(10, 10, 10, 10), .{})) |win| {
-            nk.layout.rowDynamic(ctx, 0.0, 1);
-            nk.chart.plotFunction(ctx, .NK_CHART_LINES, {}, struct {
-                fn func(_: void, i: usize) f32 {
-                    return @intToFloat(f32, i);
-                }
-            }.func, 10, 0);
-        }
-        nk.window.end(ctx);
-    }
-};
-
-pub const popup = struct {
-    pub fn begin(ctx: *nk.Context, _type: nk.PopupType, str: []const u8, flags: nk.Flags, bounds: nk.Rect) bool {
-        return c.nk_popup_begin(ctx, _type, nk.slice(str), flags, bounds) != 0;
-    }
-
-    pub fn close(ctx: *nk.Context) void {
-        return c.nk_popup_close(ctx);
-    }
-
-    pub fn end(ctx: *nk.Context) void {
-        return c.nk_popup_end(ctx);
-    }
-
-    pub fn getScroll(ctx: *nk.Context) nk.ScrollOffset {
-        var x_offset: c.nk_uint = undefined;
-        var y_offset: c.nk_uint = undefined;
-        c.nk_popup_get_scroll(ctx, &x_offset, &y_offset);
-        return .{
-            .x = x_offset,
-            .y = y_offset,
-        };
-    }
-
-    pub fn setScroll(ctx: *nk.Context, offset: nk.ScrollOffset) void {
-        c.nk_popup_set_scroll(
-            ctx,
-            @intCast(c.nk_uint, offset.x),
-            @intCast(c.nk_uint, offset.y),
-        );
-    }
-
-    test {
-        std.testing.refAllDecls(@This());
-    }
-};
-
-pub const combo = struct {
-    pub fn items(
-        ctx: *nk.Context,
-        strings: []const nk.Slice,
-        selected: usize,
-        item_height: c_int,
-        size: nk.Vec2,
-    ) usize {
-        return @intCast(usize, c.nk_combo(
-            ctx,
-            discardConst(strings.ptr),
-            @intCast(c_int, strings.len),
-            @intCast(c_int, selected),
-            item_height,
-            size,
-        ));
-    }
-
-    pub fn separator(
-        ctx: *nk.Context,
-        items_separated_by_separator: []const u8,
-        seb: c_int,
-        selected: usize,
-        count: c_int,
-        item_height: c_int,
-        size: nk.Vec2,
-    ) usize {
-        return @intCast(usize, c.nk_combo_separator(
-            ctx,
-            nk.slice(items_separated_by_separator),
-            seb,
-            @intCast(c_int, selected),
-            count,
-            item_height,
-            size,
-        ));
-    }
-
-    pub fn string(
-        ctx: *nk.Context,
-        items_separated_by_zeros: []const u8,
-        selected: usize,
-        count: c_int,
-        item_height: c_int,
-        size: nk.Vec2,
-    ) usize {
-        return @intCast(usize, c.nk_combo_string(
-            ctx,
-            nk.slice(items_separated_by_zeros),
-            @intCast(c_int, selected),
-            count,
-            item_height,
-            size,
-        ));
-    }
-
-    pub fn callback(
-        ctx: *nk.Context,
-        userdata: anytype,
-        getter: fn (@TypeOf(userdata), usize) []const u8,
-        selected: usize,
-        count: usize,
-        item_height: usize,
-        size: nk.Vec2,
-    ) usize {
-        const T = @TypeOf(userdata);
-        const Wrapped = struct {
-            userdata: T,
-            getter: fn (T, usize) []const u8,
-
-            fn valueGetter(user: ?*c_void, index: c_int, out: [*c]nk.Slice) callconv(.C) void {
-                const casted = @ptrCast(*const @This(), @alignCast(@alignOf(@This()), user));
-                out.* = nk.slice(casted.getter(casted.userdata, @intCast(usize, index)));
-            }
-        };
-
-        var wrapped = Wrapped{ .userdata = userdata, .getter = getter };
-        return @intCast(usize, c.nk_combo_callback(
-            ctx,
-            Wrapped.valueGetter,
-            @ptrCast(*c_void, &wrapped),
-            @intCast(c_int, selected),
-            @intCast(c_int, count),
-            @intCast(c_int, item_height),
-            size,
-        ));
-    }
-
-    pub fn beginLabel(ctx: *nk.Context, selected: []const u8, size: nk.Vec2) bool {
-        return c.nk_combo_begin_label(ctx, nk.slice(selected), size) != 0;
-    }
-
-    pub fn beginColor(ctx: *nk.Context, q: nk.Color, size: nk.Vec2) bool {
-        return c.nk_combo_begin_color(ctx, q, size) != 0;
-    }
-
-    pub fn beginSymbol(ctx: *nk.Context, a: nk.SymbolType, size: nk.Vec2) bool {
-        return c.nk_combo_begin_symbol(ctx, a, size) != 0;
-    }
-
-    pub fn beginSymbolLabel(
-        ctx: *nk.Context,
-        selected: []const u8,
-        a: nk.SymbolType,
-        size: nk.Vec2,
-    ) bool {
-        return c.nk_combo_begin_symbol_label(ctx, nk.slice(selected), a, size) != 0;
-    }
-
-    pub fn beginImage(ctx: *nk.Context, img: nk.Image, size: nk.Vec2) bool {
-        return c.nk_combo_begin_image(ctx, img, size) != 0;
-    }
-
-    pub fn beginImageLabel(ctx: *nk.Context, selected: []const u8, a: nk.Image, size: nk.Vec2) bool {
-        return c.nk_combo_begin_image_label(ctx, nk.slice(selected), a, size) != 0;
-    }
-
-    pub fn itemLabel(ctx: *nk.Context, a: []const u8, alignment: nk.Flags) bool {
-        return c.nk_combo_item_label(ctx, nk.slice(a), alignment) != 0;
-    }
-
-    pub fn itemImageLabel(ctx: *nk.Context, y: nk.Image, a: []const u8, alignment: nk.Flags) bool {
-        return c.nk_combo_item_image_label(ctx, y, nk.slice(a), alignment) != 0;
-    }
-
-    pub fn itemSymbolLabel(
-        ctx: *nk.Context,
-        y: nk.SymbolType,
-        a: []const u8,
-        alignment: nk.Flags,
-    ) bool {
-        return c.nk_combo_item_symbol_label(ctx, y, nk.slice(a), alignment) != 0;
-    }
-
-    pub fn close(ctx: *nk.Context) void {
-        return c.nk_combo_close(ctx);
-    }
-
-    pub fn end(ctx: *nk.Context) void {
-        return c.nk_combo_end(ctx);
-    }
-
-    test {
-        std.testing.refAllDecls(@This());
-    }
-
-    test "chart" {
-        var ctx = &try nk.testing.init();
-        defer nk.free(ctx);
-
-        if (nk.window.begin(ctx, opaque {}, nk.rect(10, 10, 10, 10), .{})) |win| {
-            nk.layout.rowDynamic(ctx, 0.0, 1);
-            _ = nk.combo.callback(ctx, {}, struct {
-                fn func(_: void, i: usize) []const u8 {
-                    return switch (i) {
-                        0 => "1",
-                        1 => "2",
-                        else => unreachable,
-                    };
-                }
-            }.func, 0, 2, 10, vec2(10, 10));
-        }
-        nk.window.end(ctx);
-    }
-};
-
-pub const contextual = struct {
-    pub fn begin(ctx: *nk.Context, y: nk.Flags, a: nk.Vec2, trigger_bounds: nk.Rect) bool {
-        return c.nk_contextual_begin(ctx, y, a, trigger_bounds) != 0;
-    }
-
-    pub fn itemLabel(ctx: *nk.Context, a: []const u8, alignment: nk.Flags) bool {
-        return c.nk_contextual_item_label(ctx, nk.slice(a), alignment) != 0;
-    }
-
-    pub fn itemImageLabel(ctx: *nk.Context, y: nk.Image, a: []const u8, alignment: nk.Flags) bool {
-        return c.nk_contextual_item_image_label(ctx, y, nk.slice(a), alignment) != 0;
-    }
-
-    pub fn itemSymbolLabel(ctx: *nk.Context, y: nk.SymbolType, a: []const u8, alignment: nk.Flags) bool {
-        return c.nk_contextual_item_symbol_label(ctx, y, nk.slice(a), alignment) != 0;
-    }
-
-    pub fn close(ctx: *nk.Context) void {
-        return c.nk_contextual_close(ctx);
-    }
-
-    pub fn end(ctx: *nk.Context) void {
-        return c.nk_contextual_end(ctx);
-    }
-
-    test {
-        std.testing.refAllDecls(@This());
-    }
-};
-
-pub const tooltip = struct {
-    pub fn text(ctx: *nk.Context, t: []const u8) void {
-        return c.nk_tooltip(ctx, nk.slice(t));
-    }
-
-    pub fn begin(ctx: *nk.Context, width: f32) bool {
-        return c.nk_tooltip_begin(ctx, width) != 0;
-    }
-
-    pub fn end(ctx: *nk.Context) void {
-        return c.nk_tooltip_end(ctx);
-    }
-
-    test {
-        std.testing.refAllDecls(@This());
-    }
-};
-
-pub const menubar = struct {
-    pub fn begin(ctx: *nk.Context) void {
-        return c.nk_menubar_begin(ctx);
-    }
-
-    pub fn end(ctx: *nk.Context) void {
-        return c.nk_menubar_end(ctx);
-    }
-
-    test {
-        std.testing.refAllDecls(@This());
-    }
-};
-
-pub const menu = struct {
-    pub fn beginLabel(ctx: *nk.Context, a: []const u8, alignment: nk.Flags, size: nk.Vec2) bool {
-        return c.nk_menu_begin_label(ctx, nk.slice(a), alignment, size) != 0;
-    }
-
-    pub fn beginImage(ctx: *nk.Context, y: []const u8, a: nk.Image, size: nk.Vec2) bool {
-        return c.nk_menu_begin_image(ctx, nk.slice(y), a, size) != 0;
-    }
-
-    pub fn beginImageLabel(
-        ctx: *nk.Context,
-        y: []const u8,
-        alignment: nk.Flags,
-        a: nk.Image,
-        size: nk.Vec2,
-    ) bool {
-        return c.nk_menu_begin_image_label(ctx, nk.slice(y), alignment, a, size) != 0;
-    }
-
-    pub fn beginSymbol(ctx: *nk.Context, y: []const u8, a: nk.SymbolType, size: nk.Vec2) bool {
-        return c.nk_menu_begin_symbol(ctx, nk.slice(y), a, size) != 0;
-    }
-
-    pub fn beginSymbolLabel(
-        ctx: *nk.Context,
-        y: []const u8,
-        alignment: nk.Flags,
-        a: nk.SymbolType,
-        size: nk.Vec2,
-    ) bool {
-        return c.nk_menu_begin_symbol_label(ctx, nk.slice(y), alignment, a, size) != 0;
-    }
-
-    pub fn itemLabel(ctx: *nk.Context, a: []const u8, alignment: nk.Flags) bool {
-        return c.nk_menu_item_label(ctx, nk.slice(a), alignment) != 0;
-    }
-
-    pub fn itemImageLabel(ctx: *nk.Context, y: nk.Image, a: []const u8, alignment: nk.Flags) bool {
-        return c.nk_menu_item_image_label(ctx, y, nk.slice(a), alignment) != 0;
-    }
-
-    pub fn itemSymbolLabel(ctx: *nk.Context, y: nk.SymbolType, a: []const u8, alignment: nk.Flags) bool {
-        return c.nk_menu_item_symbol_label(ctx, y, nk.slice(a), alignment) != 0;
-    }
-
-    pub fn close(ctx: *nk.Context) void {
-        return c.nk_menu_close(ctx);
-    }
-
-    pub fn end(ctx: *nk.Context) void {
-        return c.nk_menu_end(ctx);
-    }
-
-    test {
-        std.testing.refAllDecls(@This());
-    }
-};
-
-pub const style = struct {
-    pub fn default(ctx: *nk.Context) void {
-        return c.nk_style_default(ctx);
-    }
-
-    pub fn fromTable(ctx: *nk.Context, table: *const [c.NK_COLOR_COUNT]nk.Color) void {
-        return c.nk_style_from_table(ctx, table);
-    }
-
-    pub fn loadCursor(ctx: *nk.Context, cursor: nk.StyleCursor, cur: nk.Cursor) void {
-        return c.nk_style_load_cursor(ctx, cursor, &cur);
-    }
-
-    pub fn loadAllCursors(ctx: *nk.Context, cursors: *const [c.NK_CURSOR_COUNT]nk.Cursor) void {
-        return c.nk_style_load_all_cursors(ctx, discardConst(cursors));
-    }
-
-    pub fn getColorByName(s: nk.StyleColors) [:0]const u8 {
-        const name = getColorByNameZ(s);
-        return mem.spanZ(name);
-    }
-
-    pub fn getColorByNameZ(s: nk.StyleColors) [*:0]const u8 {
-        return @ptrCast([*:0]const u8, c.nk_style_get_color_by_name(s));
-    }
-
-    pub fn setFont(ctx: *nk.Context, font: *const nk.UserFont) void {
-        return c.nk_style_set_font(ctx, font);
-    }
-
-    pub fn setCursor(ctx: *nk.Context, u: nk.StyleCursor) bool {
-        return c.nk_style_set_cursor(ctx, u) != 0;
-    }
-
-    pub fn showCursor(ctx: *nk.Context) void {
-        return c.nk_style_show_cursor(ctx);
-    }
-
-    pub fn hideCursor(ctx: *nk.Context) void {
-        return c.nk_style_hide_cursor(ctx);
-    }
-
-    pub fn pushFont(ctx: *nk.Context, font: *const nk.UserFont) bool {
-        return c.nk_style_push_font(ctx, font) != 0;
-    }
-
-    pub fn popFont(ctx: *nk.Context) bool {
-        return c.nk_style_pop_font(ctx) != 0;
-    }
-
-    pub fn itemImage(img: nk.Image) nk.StyleItem {
-        return c.nk_style_item_image(img);
-    }
-
-    pub fn itemColor(y: nk.Color) nk.StyleItem {
-        return c.nk_style_item_color(y);
-    }
-
-    pub fn itemHide() nk.StyleItem {
-        return c.nk_style_item_hide();
-    }
-
-    test {
-        std.testing.refAllDecls(@This());
-    }
-};
-
-pub const textedit = struct {
-    pub fn init(a: *mem.Allocator, size: usize) nk.TextEdit {
-        var res: nk.TextEdit = undefined;
-        c.nk_textedit_init(
-            &res,
-            &nk.allocator(a),
-            @intCast(c.nk_size, size),
-        );
-        return res;
-    }
-
-    pub fn initFixed(memory: []u8) nk.TextEdit {
-        var res: nk.TextEdit = undefined;
-        c.nk_textedit_init_fixed(
-            &res,
-            @ptrCast(*c_void, memory.ptr),
-            @intCast(c.nk_size, memory.len),
-        );
-        return res;
-    }
-
-    pub fn free(e: *nk.TextEdit) void {
-        return c.nk_textedit_free(e);
-    }
-
-    pub fn text(e: *nk.TextEdit, t: []const u8) void {
-        return c.nk_textedit_text(e, nk.slice(t));
-    }
-
-    pub fn delete(e: *nk.TextEdit, where: usize, len: usize) void {
-        return c.nk_textedit_delete(e, @intCast(c_int, where), @intCast(c_int, len));
-    }
-
-    pub fn deleteSelection(e: *nk.TextEdit) void {
-        return c.nk_textedit_delete_selection(e);
-    }
-
-    pub fn selectAll(e: *nk.TextEdit) void {
-        return c.nk_textedit_select_all(e);
-    }
-
-    pub fn cut(e: *nk.TextEdit) bool {
-        return c.nk_textedit_cut(e) != 0;
-    }
-
-    pub fn paste(e: *nk.TextEdit, t: []const u8) bool {
-        return c.nk_textedit_paste(e, nk.slice(t)) != 0;
-    }
-
-    pub fn undo(e: *nk.TextEdit) void {
-        return c.nk_textedit_undo(e);
-    }
-
-    pub fn redo(e: *nk.TextEdit) void {
-        return c.nk_textedit_redo(e);
-    }
-
-    test {
-        std.testing.refAllDecls(@This());
-    }
-};
-
-pub const stroke = struct {
-    pub fn line(b: *nk.CommandBuffer, x0: f32, y0: f32, x1: f32, y1: f32, line_thickness: f32, col: nk.Color) void {
-        return c.nk_stroke_line(b, x0, y0, x1, y1, line_thickness, col);
-    }
-
-    pub fn curve(
-        b: *nk.CommandBuffer,
-        ax: f32,
-        ay: f32,
-        ctrl0x: f32,
-        ctrl0y: f32,
-        ctrl1x: f32,
-        ctrl1y: f32,
-        bx: f32,
-        by: f32,
-        line_thickness: f32,
-        col: nk.Color,
-    ) void {
-        return c.nk_stroke_curve(
-            b,
-            ax,
-            ay,
-            ctrl0x,
-            ctrl0y,
-            ctrl1x,
-            ctrl1y,
-            bx,
-            by,
-            line_thickness,
-            col,
-        );
-    }
-
-    pub fn rect(b: *nk.CommandBuffer, r: nk.Rect, rounding: f32, line_thickness: f32, col: nk.Color) void {
-        return c.nk_stroke_rect(b, r, rounding, line_thickness, col);
-    }
-
-    pub fn circle(b: *nk.CommandBuffer, r: nk.Rect, line_thickness: f32, col: nk.Color) void {
-        return c.nk_stroke_circle(b, r, line_thickness, col);
-    }
-
-    pub fn arc(b: *nk.CommandBuffer, cx: f32, cy: f32, radius: f32, a_min: f32, a_max: f32, line_thickness: f32, col: nk.Color) void {
-        return c.nk_stroke_arc(b, cx, cy, radius, a_min, a_max, line_thickness, col);
-    }
-
-    pub fn triangle(b: *nk.CommandBuffer, h: f32, o: f32, q: f32, d: f32, y: f32, a: f32, line_thichness: f32, u: nk.Color) void {
-        return c.nk_stroke_triangle(b, h, o, q, d, y, a, line_thichness, u);
-    }
-
-    pub fn polyline(b: *nk.CommandBuffer, points: [][2]f32, line_thickness: f32, col: nk.Color) void {
-        return c.nk_stroke_polyline(
-            b,
-            @ptrCast([*]f32, points.ptr),
-            @intCast(c_int, points.len),
-            line_thickness,
-            col,
-        );
-    }
-
-    pub fn polygon(b: *nk.CommandBuffer, points: [][2]f32, line_thickness: f32, col: nk.Color) void {
-        return c.nk_stroke_polygon(
-            b,
-            @ptrCast([*]f32, points.ptr),
-            @intCast(c_int, points.len),
-            line_thickness,
-            col,
-        );
-    }
-
-    test {
-        std.testing.refAllDecls(@This());
-    }
-};
 
 pub const rest = struct {
     test {
@@ -840,8 +192,8 @@ pub const rest = struct {
     pub fn nkImagePtr(ptr: ?*c_void) nk.Image {
         return c.nk_image_ptr(ptr);
     }
-    pub fn nkImageId(id: c_int) nk.Image {
-        return c.nk_image_id(id);
+    pub fn nkImageId(_id: c_int) nk.Image {
+        return c.nk_image_id(_id);
     }
     pub fn nkImageIsSubimage(img: [*c]const nk.Image) bool {
         return c.nk_image_is_subimage(img) != 0;
@@ -849,8 +201,8 @@ pub const rest = struct {
     pub fn nkSubimagePtr(ptr: ?*c_void, w: c_ushort, h: c_ushort, sub_region: nk.Rect) nk.Image {
         return c.nk_subimage_ptr(ptr, w, h, sub_region);
     }
-    pub fn nkSubimageId(id: c_int, w: c_ushort, h: c_ushort, sub_region: nk.Rect) nk.Image {
-        return c.nk_subimage_id(id, w, h, sub_region);
+    pub fn nkSubimageId(_id: c_int, w: c_ushort, h: c_ushort, sub_region: nk.Rect) nk.Image {
+        return c.nk_subimage_id(_id, w, h, sub_region);
     }
     pub fn nkSubimageHandle(h: nk.Handle, w: c_ushort, q: c_ushort, sub_region: nk.Rect) nk.Image {
         return c.nk_subimage_handle(h, w, q, sub_region);
@@ -882,27 +234,27 @@ pub const rest = struct {
 
     //
 
-    pub fn nkFilterDefault(t: [*c]const nk.TextEdit, unicode: nk.Rune) bool {
-        return c.nk_filter_default(t, unicode) != 0;
-    }
-    pub fn nkFilterAscii(t: [*c]const nk.TextEdit, unicode: nk.Rune) bool {
-        return c.nk_filter_ascii(t, unicode) != 0;
-    }
-    pub fn nkFilterFloat(t: [*c]const nk.TextEdit, unicode: nk.Rune) bool {
-        return c.nk_filter_float(t, unicode) != 0;
-    }
-    pub fn nkFilterDecimal(t: [*c]const nk.TextEdit, unicode: nk.Rune) bool {
-        return c.nk_filter_decimal(t, unicode) != 0;
-    }
-    pub fn nkFilterHex(t: [*c]const nk.TextEdit, unicode: nk.Rune) bool {
-        return c.nk_filter_hex(t, unicode) != 0;
-    }
-    pub fn nkFilterOct(t: [*c]const nk.TextEdit, unicode: nk.Rune) bool {
-        return c.nk_filter_oct(t, unicode) != 0;
-    }
-    pub fn nkFilterBinary(t: [*c]const nk.TextEdit, unicode: nk.Rune) bool {
-        return c.nk_filter_binary(t, unicode) != 0;
-    }
+    // pub fn nkFilterDefault(t: [*c]const nk.TextEdit, unicode: nk.Rune) bool {
+    //     return c.nk_filter_default(t, unicode) != 0;
+    // }
+    // pub fn nkFilterAscii(t: [*c]const nk.TextEdit, unicode: nk.Rune) bool {
+    //     return c.nk_filter_ascii(t, unicode) != 0;
+    // }
+    // pub fn nkFilterFloat(t: [*c]const nk.TextEdit, unicode: nk.Rune) bool {
+    //     return c.nk_filter_float(t, unicode) != 0;
+    // }
+    // pub fn nkFilterDecimal(t: [*c]const nk.TextEdit, unicode: nk.Rune) bool {
+    //     return c.nk_filter_decimal(t, unicode) != 0;
+    // }
+    // pub fn nkFilterHex(t: [*c]const nk.TextEdit, unicode: nk.Rune) bool {
+    //     return c.nk_filter_hex(t, unicode) != 0;
+    // }
+    // pub fn nkFilterOct(t: [*c]const nk.TextEdit, unicode: nk.Rune) bool {
+    //     return c.nk_filter_oct(t, unicode) != 0;
+    // }
+    // pub fn nkFilterBinary(t: [*c]const nk.TextEdit, unicode: nk.Rune) bool {
+    //     return c.nk_filter_binary(t, unicode) != 0;
+    // }
 
     //
 
@@ -955,8 +307,13 @@ pub const Color = c.struct_nk_color;
 pub const Colorf = c.struct_nk_colorf;
 pub const CommandBuffer = c.struct_nk_command_buffer;
 pub const Context = c.struct_nk_context;
+pub const ConvertConfig = c.struct_nk_convert_config;
 pub const Cursor = c.struct_nk_cursor;
 pub const CustomCallback = c.nk_command_custom_callback;
+pub const DrawCommand = c.struct_nk_draw_command;
+pub const DrawIndex = c.nk_draw_index;
+pub const DrawNullTexture = c.struct_nk_draw_null_texture;
+pub const DrawVertexLayoutElement = c.struct_nk_draw_vertex_layout_element;
 pub const Filter = c.nk_plugin_filter;
 pub const Flags = c.nk_flags;
 pub const FontAtlas = c.struct_nk_font_atlas;
@@ -976,8 +333,6 @@ pub const StyleButton = c.struct_nk_style_button;
 pub const StyleColors = c.enum_nk_style_colors;
 pub const StyleCursor = c.enum_nk_style_cursor;
 pub const StyleItem = c.struct_nk_style_item;
-pub const SymbolType = c.nk_symbol_type;
-pub const TextEdit = c.struct_nk_text_edit;
 pub const UserFont = c.struct_nk_user_font;
 pub const Vec2 = c.struct_nk_vec2;
 pub const Window = c.struct_nk_window;
@@ -1023,7 +378,7 @@ pub const Command = union(enum) {
             .NK_COMMAND_IMAGE => return .{ .image = @ptrCast(*const c.struct_nk_command_image, cmd) },
             .NK_COMMAND_CUSTOM => return .{ .custom = cmd },
             .NK_COMMAND_NOP => unreachable,
-            _ => unreachable,
+            else => unreachable,
         }
     }
 };
@@ -1054,12 +409,32 @@ pub const PanelFlags = struct {
     }
 };
 
+pub const SymbolType = enum(u8) {
+    none = c.NK_SYMBOL_NONE,
+    x = c.NK_SYMBOL_X,
+    underscore = c.NK_SYMBOL_UNDERSCORE,
+    circle_solid = c.NK_SYMBOL_CIRCLE_SOLID,
+    circle_outline = c.NK_SYMBOL_CIRCLE_OUTLINE,
+    rect_solid = c.NK_SYMBOL_RECT_SOLID,
+    rect_outline = c.NK_SYMBOL_RECT_OUTLINE,
+    triangle_up = c.NK_SYMBOL_TRIANGLE_UP,
+    triangle_down = c.NK_SYMBOL_TRIANGLE_DOWN,
+    triangle_left = c.NK_SYMBOL_TRIANGLE_LEFT,
+    triangle_right = c.NK_SYMBOL_TRIANGLE_RIGHT,
+    plus = c.NK_SYMBOL_PLUS,
+    minus = c.NK_SYMBOL_MINUS,
+
+    pub fn toNuklear(sym: SymbolType) c.enum_nk_symbol_type {
+        return @intToEnum(c.enum_nk_symbol_type, @enumToInt(sym));
+    }
+};
+
 pub const ScrollOffset = struct {
     x: usize,
     y: usize,
 };
 
-pub fn init(alloc: *mem.Allocator, font: *const UserFont) Context {
+pub fn init(alloc: *mem.Allocator, font: ?*const UserFont) Context {
     var res: Context = undefined;
     const status = c.nk_init(&res, &allocator(alloc), font);
 
@@ -1158,12 +533,18 @@ pub fn colorToU32(y: nk.Color) u32 {
 }
 
 pub fn typeId(comptime T: type) usize {
+    _ = T;
+
     // We generate a completly unique id by declaring a global variable `id` and taking
     // the address of that variable.
     const Id = struct {
         var addr: u8 = 0;
     };
     return @ptrToInt(&Id.addr);
+}
+
+pub fn id(comptime T: type) [@sizeOf(usize)]u8 {
+    return @bitCast([@sizeOf(usize)]u8, typeId(T));
 }
 
 pub fn allocator(alloc: *mem.Allocator) Allocator {

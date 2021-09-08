@@ -4,8 +4,45 @@ const std = @import("std");
 
 const testing = std.testing;
 
-pub const Buttons = c.nk_buttons;
-pub const Keys = c.nk_keys;
+pub const Buttons = enum(u8) {
+    left = c.NK_BUTTON_LEFT,
+    middle = c.NK_BUTTON_MIDDLE,
+    right = c.NK_BUTTON_RIGHT,
+    double = c.NK_BUTTON_DOUBLE,
+};
+
+pub const Keys = enum(u8) {
+    none = c.NK_KEY_NONE,
+    shift = c.NK_KEY_SHIFT,
+    ctrl = c.NK_KEY_CTRL,
+    del = c.NK_KEY_DEL,
+    enter = c.NK_KEY_ENTER,
+    tab = c.NK_KEY_TAB,
+    backspace = c.NK_KEY_BACKSPACE,
+    copy = c.NK_KEY_COPY,
+    cut = c.NK_KEY_CUT,
+    paste = c.NK_KEY_PASTE,
+    up = c.NK_KEY_UP,
+    down = c.NK_KEY_DOWN,
+    left = c.NK_KEY_LEFT,
+    right = c.NK_KEY_RIGHT,
+    text_insert_mode = c.NK_KEY_TEXT_INSERT_MODE,
+    text_replace_mode = c.NK_KEY_TEXT_REPLACE_MODE,
+    text_reset_mode = c.NK_KEY_TEXT_RESET_MODE,
+    text_line_start = c.NK_KEY_TEXT_LINE_START,
+    text_line_end = c.NK_KEY_TEXT_LINE_END,
+    text_start = c.NK_KEY_TEXT_START,
+    text_end = c.NK_KEY_TEXT_END,
+    text_undo = c.NK_KEY_TEXT_UNDO,
+    text_redo = c.NK_KEY_TEXT_REDO,
+    text_select_all = c.NK_KEY_TEXT_SELECT_ALL,
+    text_word_left = c.NK_KEY_TEXT_WORD_LEFT,
+    text_word_right = c.NK_KEY_TEXT_WORD_RIGHT,
+    scroll_start = c.NK_KEY_SCROLL_START,
+    scroll_end = c.NK_KEY_SCROLL_END,
+    scroll_down = c.NK_KEY_SCROLL_DOWN,
+    scroll_up = c.NK_KEY_SCROLL_UP,
+};
 
 const input = @This();
 
@@ -22,10 +59,16 @@ pub fn key(ctx: *nk.Context, keys: Keys, down: bool) void {
 }
 
 pub fn button(ctx: *nk.Context, bot: Buttons, x: c_int, y: c_int, down: bool) void {
-    c.nk_input_button(ctx, bot, x, y, @boolToInt(down));
+    c.nk_input_button(
+        ctx,
+        @intToEnum(c.enum_nk_buttons, @enumToInt(bot)),
+        x,
+        y,
+        @boolToInt(down),
+    );
 }
 
-pub fn scroll(ctx: *nk.Context, val: c.struct_nk_vec2) void {
+pub fn scroll(ctx: *nk.Context, val: nk.Vec2) void {
     c.nk_input_scroll(ctx, val);
 }
 
@@ -115,8 +158,8 @@ test "input" {
 
     input.begin(ctx);
     input.motion(ctx, 20, 20);
-    input.key(ctx, .NK_KEY_DEL, true);
-    input.button(ctx, .NK_BUTTON_LEFT, 40, 40, true);
+    input.key(ctx, .del, true);
+    input.button(ctx, .left, 40, 40, true);
     input.scroll(ctx, nk.vec2(20.0, 20.0));
     input.char(ctx, 'a');
     input.glyph(ctx, "👀".*);

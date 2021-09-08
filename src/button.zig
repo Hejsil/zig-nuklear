@@ -16,15 +16,28 @@ pub fn color(ctx: *nk.Context, col: nk.Color) bool {
 }
 
 pub fn symbol(ctx: *nk.Context, sym: nk.SymbolType) bool {
-    return c.nk_button_symbol(ctx, sym) != 0;
+    return c.nk_button_symbol(
+        ctx,
+        sym.toNuklear(),
+    ) != 0;
 }
 
 pub fn image(ctx: *nk.Context, img: nk.Image) bool {
     return c.nk_button_image(ctx, img) != 0;
 }
 
-pub fn symbolLabel(ctx: *nk.Context, sym: nk.SymbolType, title: []const u8, flags: nk.Flags) bool {
-    return c.nk_button_symbol_label(ctx, sym, nk.slice(title), flags) != 0;
+pub fn symbolLabel(
+    ctx: *nk.Context,
+    sym: nk.SymbolType,
+    title: []const u8,
+    flags: nk.text.Align,
+) bool {
+    return c.nk_button_symbol_label(
+        ctx,
+        sym.toNuklear(),
+        nk.slice(title),
+        @enumToInt(flags),
+    ) != 0;
 }
 
 pub fn imageLabel(ctx: *nk.Context, img: nk.Image, title: []const u8, flags: nk.Flags) bool {
@@ -35,32 +48,44 @@ pub fn labelStyled(ctx: *nk.Context, style: *const nk.StyleButton, title: []cons
     return c.nk_button_label_styled(ctx, style, nk.slice(title)) != 0;
 }
 
-pub fn symbolStyled(ctx: *nk.Context, style: *const nk.StyleButton, sym: nk.SymbolType) bool {
-    return c.nk_button_symbol_styled(ctx, style, sym) != 0;
+pub fn symbolStyled(ctx: *nk.Context, sym: nk.SymbolType, style: nk.StyleButton) bool {
+    return c.nk_button_symbol_styled(ctx, &style, sym.toNuklear()) != 0;
 }
 
-pub fn imageStyled(ctx: *nk.Context, style: *const nk.StyleButton, img: nk.Image) bool {
-    return c.nk_button_image_styled(ctx, style, img) != 0;
+pub fn imageStyled(ctx: *nk.Context, img: nk.Image, style: nk.StyleButton) bool {
+    return c.nk_button_image_styled(ctx, &style, img) != 0;
 }
 
 pub fn symbolLabelStyled(
     ctx: *nk.Context,
-    style: *const nk.StyleButton,
     sym: nk.SymbolType,
     title: []const u8,
-    flags: nk.Flags,
+    flags: nk.text.Align,
+    style: nk.StyleButton,
 ) bool {
-    return c.nk_button_symbol_label_styled(ctx, style, sym, nk.slice(title), flags) != 0;
+    return c.nk_button_symbol_label_styled(
+        ctx,
+        &style,
+        sym.toNuklear(),
+        nk.slice(title),
+        @enumToInt(flags),
+    ) != 0;
 }
 
 pub fn imageLabelStyled(
     ctx: *nk.Context,
-    style: *const nk.StyleButton,
     img: nk.Image,
     title: []const u8,
     flags: nk.Flags,
+    style: nk.StyleButton,
 ) bool {
-    return c.nk_button_image_label_styled(ctx, style, img, nk.slice(title), flags) != 0;
+    return c.nk_button_image_label_styled(
+        ctx,
+        &style,
+        img,
+        nk.slice(title),
+        flags,
+    ) != 0;
 }
 
 pub fn setBehavior(ctx: *nk.Context, behavior: Behavior) void {

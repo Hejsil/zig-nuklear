@@ -5,20 +5,7 @@ const std = @import("std");
 const mem = std.mem;
 const testing = std.testing;
 
-/// Same as `beginTitled` but instead of taking a `name` which the caller needs to ensure
-/// is a unique string, this function generates a unique name for each unique type passed
-/// to `id`.
 pub fn begin(
-    ctx: *nk.Context,
-    comptime Id: type,
-    bounds: nk.Rect,
-    flags: nk.PanelFlags,
-) ?*const nk.Window {
-    const id = nk.typeId(Id);
-    return beginTitled(ctx, mem.asBytes(&id), bounds, flags);
-}
-
-pub fn beginTitled(
     ctx: *nk.Context,
     name: []const u8,
     bounds: nk.Rect,
@@ -41,12 +28,7 @@ pub fn end(ctx: *nk.Context) void {
     c.nk_end(ctx);
 }
 
-pub fn find(ctx: *nk.Context, comptime Id: type) ?*const nk.Window {
-    const id = nk.typeId(Id);
-    return findByName(ctx, mem.asBytes(&id));
-}
-
-pub fn findByName(ctx: *nk.Context, name: []const u8) ?*const nk.Window {
+pub fn find(ctx: *nk.Context, name: []const u8) ?*const nk.Window {
     return c.nk_window_find(ctx, nk.slice(name));
 }
 
@@ -76,9 +58,9 @@ test "window" {
     var ctx = &try nk.testing.init();
     defer nk.free(ctx);
 
-    const Id = opaque {};
-    if (nk.window.begin(ctx, Id, nk.rect(10, 10, 10, 10), .{})) |win| {
-        try std.testing.expectEqual(@as(?*const nk.Window, win), nk.window.find(ctx, Id));
+    const id = nk.id(opaque {});
+    if (nk.window.begin(ctx, &id, nk.rect(10, 10, 10, 10), .{})) |win| {
+        try std.testing.expectEqual(@as(?*const nk.Window, win), nk.window.find(ctx, &id));
     }
     nk.window.end(ctx);
 }

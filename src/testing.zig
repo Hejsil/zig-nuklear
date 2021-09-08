@@ -14,7 +14,7 @@ fn testDefaultFont() !*nk.UserFont {
     var fba = heap.FixedBufferAllocator.init(&test_default_atlas_buf);
     test_default_atlas = nk.atlas.init(&fba.allocator);
     test_default_font = &(try nk.atlas.addDefault(&test_default_atlas, 13, null)).handle;
-    _ = try nk.atlas.bake(&test_default_atlas, .NK_FONT_ATLAS_RGBA32);
+    _ = try nk.atlas.bake(&test_default_atlas, .rgba32);
     nk.atlas.end(&test_default_atlas, .{ .id = 0 }, null);
     return test_default_font.?;
 }

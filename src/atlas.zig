@@ -12,7 +12,11 @@ const testing = std.testing;
 
 pub const Config = c.struct_nk_font_config;
 pub const Font = c.struct_nk_font;
-pub const Format = c.nk_font_atlas_format;
+
+pub const Format = enum(u8) {
+    alpha8 = c.NK_FONT_ATLAS_ALPHA8,
+    rgba32 = c.NK_FONT_ATLAS_RGBA32,
+};
 
 pub fn init(allocator: *mem.Allocator) nk.FontAtlas {
     var res: nk.FontAtlas = undefined;
@@ -85,11 +89,21 @@ pub fn addCompressedBase85(
 }
 
 pub fn bake(atlas: *nk.FontAtlas, format: Format) !Baked {
-    var res: Baked = undefined;
-    const data = c.nk_font_atlas_bake(atlas, &res.w, &res.h, format) orelse
+    var w: c_int = undefined;
+    var h: c_int = undefined;
+    const data = c.nk_font_atlas_bake(
+        atlas,
+        &w,
+        &h,
+        @intToEnum(c.enum_nk_font_atlas_format, @enumToInt(format)),
+    ) orelse
         return error.OutOfMemory;
-    res.data = @ptrCast([*]const u8, data);
-    return res;
+
+    return Baked{
+        .data = @ptrCast([*]const u8, data),
+        .w = @intCast(usize, w),
+        .h = @intCast(usize, h),
+    };
 }
 
 pub fn end(atlas: *nk.FontAtlas, tex: nk.Handle, null_tex: ?*c.nk_draw_null_texture) void {
@@ -98,8 +112,8 @@ pub fn end(atlas: *nk.FontAtlas, tex: nk.Handle, null_tex: ?*c.nk_draw_null_text
 
 pub const Baked = struct {
     data: [*]const u8,
-    w: c_int,
-    h: c_int,
+    w: usize,
+    h: usize,
 };
 
 test {
