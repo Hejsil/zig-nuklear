@@ -12,6 +12,11 @@ pub fn showcase(ctx: *nk.Context) void {
         var check_flags_label: usize = 0;
         var color_picker_picked: nk.Colorf = .{ .r = 0, .g = 0, .b = 0, .a = 0, ._pad = 0 };
         var color_pick_picked: nk.Colorf = .{ .r = 0, .g = 0, .b = 0, .a = 0, ._pad = 0 };
+        var combo_items_selected: usize = 0;
+        var combo_sep_selected: usize = 0;
+        var combo_string_selected: usize = 0;
+        var combo_callback_selected: usize = 0;
+        var combo_begin_label_selected: []const u8 = "BUTTONS!";
     };
 
     if (nk.window.begin(ctx, &nk.id(opaque {}), nk.rect(100, 100, 500, 500), .{
@@ -207,19 +212,72 @@ pub fn showcase(ctx: *nk.Context) void {
                 });
         }
 
-        // if (nk.group.begin(ctx, &nk.id(opaque {}), .{
-        //     .title = "nk.combo",
-        //     .border = true,
-        //     .scrollbar = false,
-        // })) {
-        //     defer nk.group.end(ctx);
+        nk.layout.rowDynamic(ctx, 140, 1);
+        if (nk.group.begin(ctx, &nk.id(opaque {}), .{
+            .title = "nk.combo",
+            .border = true,
+            .scrollbar = false,
+        })) {
+            defer nk.group.end(ctx);
 
-        //     nk.layout.rowDynamic(ctx, 0, 2);
-        //     _ = nk.combo.items(ctx, &.{
-        //         nk.slice("abc"),
-        //         nk.slice("def"),
-        //     }, 0, 0, nk.vec2(0, 0));
-        // }
+            const size = nk.vec2(200, 600);
+
+            nk.layout.rowDynamic(ctx, 0, 2);
+            Static.combo_items_selected = nk.combo.items(
+                ctx,
+                size,
+                16,
+                Static.combo_items_selected,
+                &.{
+                    nk.slice("this"),  nk.slice("is"), nk.slice("an"),
+                    nk.slice("array"), nk.slice("of"), nk.slice("strings"),
+                },
+            );
+            Static.combo_sep_selected = nk.combo.separator(
+                ctx,
+                size,
+                16,
+                Static.combo_sep_selected,
+                5,
+                ',',
+                "this,is,seperated,by,comma",
+            );
+            Static.combo_string_selected = nk.combo.string(
+                ctx,
+                size,
+                16,
+                Static.combo_string_selected,
+                5,
+                "this\x00is\x00seperated\x00by\x00null",
+            );
+            Static.combo_callback_selected = nk.combo.callback(
+                ctx,
+                size,
+                16,
+                Static.combo_callback_selected,
+                5,
+                {},
+                struct {
+                    fn callback(_: void, index: usize) []const u8 {
+                        return "abcdef"[0 .. index + 1];
+                    }
+                }.callback,
+            );
+
+            if (nk.combo.beginLabel(ctx, size, Static.combo_begin_label_selected)) {
+                defer nk.combo.end(ctx);
+
+                nk.layout.rowDynamic(ctx, 0, 2);
+                if (nk.button.label(ctx, "pretty"))
+                    Static.combo_begin_label_selected = "pretty";
+                if (nk.button.label(ctx, "neat"))
+                    Static.combo_begin_label_selected = "neat";
+
+                nk.layout.rowDynamic(ctx, 0, 1);
+                if (nk.button.label(ctx, "BUTTONS!"))
+                    Static.combo_begin_label_selected = "BUTTONS!";
+            }
+        }
     }
     nk.window.end(ctx);
 }

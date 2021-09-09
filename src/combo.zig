@@ -6,67 +6,67 @@ const testing = std.testing;
 
 pub fn items(
     ctx: *nk.Context,
-    strings: []const nk.Slice,
-    selected: usize,
-    item_height: c_int,
     size: nk.Vec2,
+    item_height: usize,
+    selected: usize,
+    strings: []const nk.Slice,
 ) usize {
     return @intCast(usize, c.nk_combo(
         ctx,
         nk.discardConst(strings.ptr),
         @intCast(c_int, strings.len),
         @intCast(c_int, selected),
-        item_height,
+        @intCast(c_int, item_height),
         size,
     ));
 }
 
 pub fn separator(
     ctx: *nk.Context,
-    items_separated_by_separator: []const u8,
-    seb: c_int,
-    selected: usize,
-    count: c_int,
-    item_height: c_int,
     size: nk.Vec2,
+    item_height: usize,
+    selected: usize,
+    count: usize,
+    seb: u8,
+    items_separated_by_separator: []const u8,
 ) usize {
     return @intCast(usize, c.nk_combo_separator(
         ctx,
         nk.slice(items_separated_by_separator),
-        seb,
+        @intCast(c_int, seb),
         @intCast(c_int, selected),
-        count,
-        item_height,
+        @intCast(c_int, count),
+        @intCast(c_int, item_height),
         size,
     ));
 }
 
 pub fn string(
     ctx: *nk.Context,
-    items_separated_by_zeros: []const u8,
-    selected: usize,
-    count: c_int,
-    item_height: c_int,
     size: nk.Vec2,
+    item_height: usize,
+    selected: usize,
+    count: usize,
+    items_separated_by_zeros: []const u8,
 ) usize {
     return @intCast(usize, c.nk_combo_string(
         ctx,
         nk.slice(items_separated_by_zeros),
         @intCast(c_int, selected),
-        count,
-        item_height,
+        @intCast(c_int, count),
+        @intCast(c_int, item_height),
         size,
     ));
 }
 
 pub fn callback(
     ctx: *nk.Context,
-    userdata: anytype,
-    getter: fn (@TypeOf(userdata), usize) []const u8,
+    size: nk.Vec2,
+    item_height: usize,
     selected: usize,
     count: usize,
-    item_height: usize,
-    size: nk.Vec2,
+    userdata: anytype,
+    getter: fn (@TypeOf(userdata), usize) []const u8,
 ) usize {
     const T = @TypeOf(userdata);
     const Wrapped = struct {
@@ -91,32 +91,32 @@ pub fn callback(
     ));
 }
 
-pub fn beginLabel(ctx: *nk.Context, selected: []const u8, size: nk.Vec2) bool {
+pub fn beginLabel(ctx: *nk.Context, size: nk.Vec2, selected: []const u8) bool {
     return c.nk_combo_begin_label(ctx, nk.slice(selected), size) != 0;
 }
 
-pub fn beginColor(ctx: *nk.Context, q: nk.Color, size: nk.Vec2) bool {
+pub fn beginColor(ctx: *nk.Context, size: nk.Vec2, q: nk.Color) bool {
     return c.nk_combo_begin_color(ctx, q, size) != 0;
 }
 
-pub fn beginSymbol(ctx: *nk.Context, a: nk.SymbolType, size: nk.Vec2) bool {
+pub fn beginSymbol(ctx: *nk.Context, size: nk.Vec2, a: nk.SymbolType) bool {
     return c.nk_combo_begin_symbol(ctx, a, size) != 0;
 }
 
 pub fn beginSymbolLabel(
     ctx: *nk.Context,
+    size: nk.Vec2,
     selected: []const u8,
     a: nk.SymbolType,
-    size: nk.Vec2,
 ) bool {
     return c.nk_combo_begin_symbol_label(ctx, nk.slice(selected), a, size) != 0;
 }
 
-pub fn beginImage(ctx: *nk.Context, img: nk.Image, size: nk.Vec2) bool {
+pub fn beginImage(ctx: *nk.Context, size: nk.Vec2, img: nk.Image) bool {
     return c.nk_combo_begin_image(ctx, img, size) != 0;
 }
 
-pub fn beginImageLabel(ctx: *nk.Context, selected: []const u8, a: nk.Image, size: nk.Vec2) bool {
+pub fn beginImageLabel(ctx: *nk.Context, size: nk.Vec2, selected: []const u8, a: nk.Image) bool {
     return c.nk_combo_begin_image_label(ctx, nk.slice(selected), a, size) != 0;
 }
 
@@ -149,13 +149,13 @@ test {
     testing.refAllDecls(@This());
 }
 
-test "chart" {
+test "combo" {
     var ctx = &try nk.testing.init();
     defer nk.free(ctx);
 
     if (nk.window.begin(ctx, &nk.id(opaque {}), nk.rect(10, 10, 10, 10), .{})) |_| {
         nk.layout.rowDynamic(ctx, 0.0, 1);
-        _ = nk.combo.callback(ctx, {}, struct {
+        _ = nk.combo.callback(ctx, nk.vec2(10, 10), 0, 0, 2, {}, struct {
             fn func(_: void, i: usize) []const u8 {
                 return switch (i) {
                     0 => "1",
@@ -163,7 +163,7 @@ test "chart" {
                     else => unreachable,
                 };
             }
-        }.func, 0, 2, 10, nk.vec2(10, 10));
+        }.func);
     }
     nk.window.end(ctx);
 }
