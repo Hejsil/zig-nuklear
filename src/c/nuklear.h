@@ -44,11 +44,6 @@ char *zigNuklearDtoa(char *s, double n);
 #define NK_MEMCPY
 #define NK_STRTOD
 
-#define NK_INCLUDE_DEFAULT_FONT
-#define NK_INCLUDE_FONT_BAKING
-#define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
-#define NK_ZERO_COMMAND_MEMORY
-#define NK_KEYSTATE_BASED_INPUT
 #include "nuklear/nuklear.h"
 
 nk_size zigNuklearStrlen(const char *x);

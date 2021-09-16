@@ -87,7 +87,7 @@ pub fn stringZ(
 ) nk.Flags {
     return c.nk_edit_string_zero_terminated(
         ctx,
-        opts.flags,
+        opts.flags.toNulkear(),
         buf,
         @intCast(c_int, max),
         opts.filter,
@@ -95,7 +95,7 @@ pub fn stringZ(
 }
 
 pub fn buffer(ctx: *nk.Context, t: *Text, opts: Options) nk.Flags {
-    return c.nk_edit_buffer(ctx, opts.flags, t, opts.filter);
+    return c.nk_edit_buffer(ctx, opts.flags.toNulkear(), t, opts.filter);
 }
 
 pub fn focus(ctx: *nk.Context, flags: nk.Flags) void {

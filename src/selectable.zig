@@ -32,7 +32,13 @@ pub fn symbolLabel(
 ) bool {
     var c_value: c.nk_bool = @boolToInt(value.*);
     defer value.* = c_value != 0;
-    return c.nk_selectable_symbol_label(ctx, symbol, nk.slice(title), flags, &c_value) != 0;
+    return c.nk_selectable_symbol_label(
+        ctx,
+        symbol.toNuklear(),
+        nk.slice(title),
+        flags,
+        &c_value,
+    ) != 0;
 }
 
 test {

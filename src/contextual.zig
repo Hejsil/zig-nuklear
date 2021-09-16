@@ -16,8 +16,13 @@ pub fn itemImageLabel(ctx: *nk.Context, y: nk.Image, a: []const u8, alignment: n
     return c.nk_contextual_item_image_label(ctx, y, nk.slice(a), alignment) != 0;
 }
 
-pub fn itemSymbolLabel(ctx: *nk.Context, y: nk.SymbolType, a: []const u8, alignment: nk.Flags) bool {
-    return c.nk_contextual_item_symbol_label(ctx, y, nk.slice(a), alignment) != 0;
+pub fn itemSymbolLabel(
+    ctx: *nk.Context,
+    symbol: nk.SymbolType,
+    a: []const u8,
+    alignment: nk.Flags,
+) bool {
+    return c.nk_contextual_item_symbol_label(ctx, symbol.toNuklear(), nk.slice(a), alignment) != 0;
 }
 
 pub fn close(ctx: *nk.Context) void {

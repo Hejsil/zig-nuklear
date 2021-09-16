@@ -9,14 +9,76 @@ WIP bindings for [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear).
 * Support using Nuklear with or without libc.
   * Provide default implementations for overridable Nuklear function in Zig if libc is
     unwanted.
-* Have a few backends that don't depend on any system libraries (exept the basic
-  libraries all programs depend on for that system).
-  * By doing this, we get easy cross compilation!
 
-## TODO:
+## Usage
 
-* [ ] Provide wrappers for all ui functions provided by Nuklear
-* [ ] Provide a few backends with minimal system dependencies:
-  * [ ] Windows (using gdi)
-  * [ ] Linux (x11, maybe wayland)
+This is an example with no backend. See [`examples/main.zig`](examples/main.zig) for a full example
+using `glfw` and `opengl`.
+
+`build.zig`
+```zig
+const Nuklear = @import("zig-nuklear/build.zig");
+const std = @import("std");
+
+const Builder = std.build.Builder;
+
+pub fn build(b: *Builder) void {
+    const mode = b.standardReleaseOptions();
+    const target = b.standardTargetOptions(.{});
+
+    const nk = Nuklear.init(b, .{});
+
+    const exe = b.addExecutable("main", "main.zig");
+    nk.addTo(exe, .{});
+
+    // Link to your backend here!
+
+    exe.setBuildMode(mode);
+    exe.setTarget(target);
+    exe.install();
+}
+```
+
+`main.zig`
+```zig
+const nk = @import("nuklear");
+const std = @import("std");
+
+pub fn main() !void {
+    const allocator = // Choose your allocator!
+    const font = // Initialize your font!
+    const ctx = &nk.init(allocator, font);
+    defer nk.free(ctx);
+
+    while (
+        // Backend is running
+    ) {
+        nk.input.begin(ctx);
+
+        // Forward events from backend to Nuklear here!
+
+        nk.input.end(ctx);
+
+        if (nk.window.begin(ctx, &nk.id(opaque {}), nk.rect(0, 0, 200, 200), .{
+            .title = "hello world",
+            .border = true,
+            .moveable = true,
+            .closable = true,
+            .minimizable = true,
+            .background = false,
+            .scalable = true,
+        })) |_| {
+            nk.layout.rowDynamic(ctx, 0, 1);
+            nk.text.label(ctx, "Hello world!", .mid_right);
+            if (nk.button.label(ctx, "Hello world!"))
+                std.log.info("Hello world!", .{});
+        }
+        nk.window.end(ctx);
+
+        // Render gui out to your backend here!
+
+        nk.clear(ctx);
+    }
+}
+```
 

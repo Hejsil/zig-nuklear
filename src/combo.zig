@@ -99,17 +99,17 @@ pub fn beginColor(ctx: *nk.Context, size: nk.Vec2, q: nk.Color) bool {
     return c.nk_combo_begin_color(ctx, q, size) != 0;
 }
 
-pub fn beginSymbol(ctx: *nk.Context, size: nk.Vec2, a: nk.SymbolType) bool {
-    return c.nk_combo_begin_symbol(ctx, a, size) != 0;
+pub fn beginSymbol(ctx: *nk.Context, size: nk.Vec2, symbol: nk.SymbolType) bool {
+    return c.nk_combo_begin_symbol(ctx, symbol.toNuklear(), size) != 0;
 }
 
 pub fn beginSymbolLabel(
     ctx: *nk.Context,
     size: nk.Vec2,
     selected: []const u8,
-    a: nk.SymbolType,
+    symbol: nk.SymbolType,
 ) bool {
-    return c.nk_combo_begin_symbol_label(ctx, nk.slice(selected), a, size) != 0;
+    return c.nk_combo_begin_symbol_label(ctx, nk.slice(selected), symbol.toNuklear(), size) != 0;
 }
 
 pub fn beginImage(ctx: *nk.Context, size: nk.Vec2, img: nk.Image) bool {
@@ -130,11 +130,11 @@ pub fn itemImageLabel(ctx: *nk.Context, y: nk.Image, a: []const u8, alignment: n
 
 pub fn itemSymbolLabel(
     ctx: *nk.Context,
-    y: nk.SymbolType,
+    symbol: nk.SymbolType,
     a: []const u8,
     alignment: nk.Flags,
 ) bool {
-    return c.nk_combo_item_symbol_label(ctx, y, nk.slice(a), alignment) != 0;
+    return c.nk_combo_item_symbol_label(ctx, symbol.toNuklear(), nk.slice(a), alignment) != 0;
 }
 
 pub fn close(ctx: *nk.Context) void {

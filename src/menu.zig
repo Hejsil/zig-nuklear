@@ -22,18 +22,24 @@ pub fn beginImageLabel(
     return c.nk_menu_begin_image_label(ctx, nk.slice(y), alignment, a, size) != 0;
 }
 
-pub fn beginSymbol(ctx: *nk.Context, y: []const u8, a: nk.SymbolType, size: nk.Vec2) bool {
-    return c.nk_menu_begin_symbol(ctx, nk.slice(y), a, size) != 0;
+pub fn beginSymbol(ctx: *nk.Context, y: []const u8, symbol: nk.SymbolType, size: nk.Vec2) bool {
+    return c.nk_menu_begin_symbol(ctx, nk.slice(y), symbol.toNuklear(), size) != 0;
 }
 
 pub fn beginSymbolLabel(
     ctx: *nk.Context,
     y: []const u8,
     alignment: nk.Flags,
-    a: nk.SymbolType,
+    symbol: nk.SymbolType,
     size: nk.Vec2,
 ) bool {
-    return c.nk_menu_begin_symbol_label(ctx, nk.slice(y), alignment, a, size) != 0;
+    return c.nk_menu_begin_symbol_label(
+        ctx,
+        nk.slice(y),
+        alignment,
+        symbol.toNuklear(),
+        size,
+    ) != 0;
 }
 
 pub fn itemLabel(ctx: *nk.Context, a: []const u8, alignment: nk.Flags) bool {
@@ -44,8 +50,18 @@ pub fn itemImageLabel(ctx: *nk.Context, y: nk.Image, a: []const u8, alignment: n
     return c.nk_menu_item_image_label(ctx, y, nk.slice(a), alignment) != 0;
 }
 
-pub fn itemSymbolLabel(ctx: *nk.Context, y: nk.SymbolType, a: []const u8, alignment: nk.Flags) bool {
-    return c.nk_menu_item_symbol_label(ctx, y, nk.slice(a), alignment) != 0;
+pub fn itemSymbolLabel(
+    ctx: *nk.Context,
+    symbol: nk.SymbolType,
+    a: []const u8,
+    alignment: nk.Flags,
+) bool {
+    return c.nk_menu_item_symbol_label(
+        ctx,
+        symbol.toNuklear(),
+        nk.slice(a),
+        alignment,
+    ) != 0;
 }
 
 pub fn close(ctx: *nk.Context) void {

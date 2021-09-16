@@ -26,7 +26,13 @@ pub fn symbolLabel(
     flags: nk.Flags,
     value: bool,
 ) bool {
-    return c.nk_select_symbol_label(ctx, symbol, nk.slice(title), flags, @boolToInt(value)) != 0;
+    return c.nk_select_symbol_label(
+        ctx,
+        symbol.toNuklear(),
+        nk.slice(title),
+        flags,
+        @boolToInt(value),
+    ) != 0;
 }
 
 test {
