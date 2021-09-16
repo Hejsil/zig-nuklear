@@ -17,6 +17,9 @@ pub fn showcase(ctx: *nk.Context) void {
         var combo_string_selected: usize = 0;
         var combo_callback_selected: usize = 0;
         var combo_begin_label_selected: []const u8 = "BUTTONS!";
+        var edit_string_buf: [100]u8 = undefined;
+        var edit_string: []u8 = edit_string_buf[0..0];
+        var edit_stringz: [100:0]u8 = [_]u8{0} ** 100;
     };
 
     if (nk.window.begin(ctx, &nk.id(opaque {}), nk.rect(100, 100, 500, 500), .{
@@ -277,6 +280,49 @@ pub fn showcase(ctx: *nk.Context) void {
                 if (nk.button.label(ctx, "BUTTONS!"))
                     Static.combo_begin_label_selected = "BUTTONS!";
             }
+        }
+
+        // if (nk.group.begin(ctx, &nk.id(opaque {}), .{
+        //     .title = "nk.contextual",
+        //     .border = true,
+        //     .scrollbar = false,
+        // })) {
+        //     defer nk.group.end(ctx);
+
+        // }
+
+        if (nk.group.begin(ctx, &nk.id(opaque {}), .{
+            .title = "nk.edit",
+            .border = true,
+            .scrollbar = false,
+        })) {
+            defer nk.group.end(ctx);
+
+            nk.layout.rowDynamic(ctx, 0, 2);
+            _ = nk.edit.string(
+                ctx,
+                &Static.edit_string,
+                Static.edit_string_buf.len,
+                .{ .flags = nk.edit.Flags.simple },
+            );
+            _ = nk.edit.string(
+                ctx,
+                &Static.edit_string,
+                Static.edit_string_buf.len,
+                .{ .flags = nk.edit.Flags.field },
+            );
+            _ = nk.edit.string(
+                ctx,
+                &Static.edit_string,
+                Static.edit_string_buf.len,
+                .{ .flags = nk.edit.Flags.box },
+            );
+            _ = nk.edit.string(
+                ctx,
+                &Static.edit_string,
+                Static.edit_string_buf.len,
+                .{ .flags = nk.edit.Flags.editor },
+            );
         }
     }
     nk.window.end(ctx);
