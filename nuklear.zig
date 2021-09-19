@@ -330,7 +330,6 @@ pub const Rune = c.nk_rune;
 pub const Scroll = c.struct_nk_scroll;
 pub const Slice = c.struct_nk_slice;
 pub const StyleButton = c.struct_nk_style_button;
-pub const StyleColors = c.enum_nk_style_colors;
 pub const StyleCursor = c.enum_nk_style_cursor;
 pub const StyleItem = c.struct_nk_style_item;
 pub const UserFont = c.struct_nk_user_font;
