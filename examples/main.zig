@@ -26,7 +26,7 @@ pub fn main() !void {
     var height: c_int = undefined;
     c.glfwGetWindowSize(win, &width, &height);
 
-    var atlas = nk.atlas.init(allocator);
+    var atlas = nk.atlas.init(&allocator);
     defer nk.atlas.clear(&atlas);
 
     nk.atlas.begin(&atlas);
@@ -39,7 +39,7 @@ pub fn main() !void {
         &_null,
     );
 
-    var ctx = nk.init(allocator, &atlas.default_font.*.handle);
+    var ctx = nk.init(&allocator, &atlas.default_font.*.handle);
     defer nk.free(&ctx);
 
     ctx.clip.copy = undefined;
@@ -49,9 +49,9 @@ pub fn main() !void {
     var program = Program{
         .ctx = ctx,
         .null_texture = _null,
-        .cmds = nk.Buffer.init(allocator, mem.page_size),
-        .vbuf = nk.Buffer.init(allocator, mem.page_size),
-        .ebuf = nk.Buffer.init(allocator, mem.page_size),
+        .cmds = nk.Buffer.init(&allocator, mem.page_size),
+        .vbuf = nk.Buffer.init(&allocator, mem.page_size),
+        .ebuf = nk.Buffer.init(&allocator, mem.page_size),
 
         .win = win,
     };
@@ -61,7 +61,7 @@ pub fn main() !void {
         program.ebuf.free();
     }
 
-    c.glfwSetWindowUserPointer(win, @ptrCast(*c_void, &program));
+    c.glfwSetWindowUserPointer(win, @ptrCast(*anyopaque, &program));
 
     while (c.glfwWindowShouldClose(program.win) == 0) {
         program.input();
@@ -198,15 +198,15 @@ fn render(program: *Program) void {
     c.glEnableClientState(c.GL_COLOR_ARRAY);
     {
         const vs = @sizeOf(GlfwVertex);
-        const vp = @byteOffsetOf(GlfwVertex, "position");
-        const vt = @byteOffsetOf(GlfwVertex, "uv");
-        const vc = @byteOffsetOf(GlfwVertex, "col");
+        const vp = @offsetOf(GlfwVertex, "position");
+        const vt = @offsetOf(GlfwVertex, "uv");
+        const vc = @offsetOf(GlfwVertex, "col");
 
         const vertex_layout = [_]nk.DrawVertexLayoutElement{
-            .{ .attribute = .NK_VERTEX_POSITION, .format = .NK_FORMAT_FLOAT, .offset = vp },
-            .{ .attribute = .NK_VERTEX_TEXCOORD, .format = .NK_FORMAT_FLOAT, .offset = vt },
-            .{ .attribute = .NK_VERTEX_COLOR, .format = .NK_FORMAT_R8G8B8A8, .offset = vc },
-            .{ .attribute = .NK_VERTEX_ATTRIBUTE_COUNT, .format = .NK_FORMAT_COUNT, .offset = 0 },
+            .{ .attribute = nk.c.NK_VERTEX_POSITION, .format = nk.c.NK_FORMAT_FLOAT, .offset = vp },
+            .{ .attribute = nk.c.NK_VERTEX_TEXCOORD, .format = nk.c.NK_FORMAT_FLOAT, .offset = vt },
+            .{ .attribute = nk.c.NK_VERTEX_COLOR, .format = nk.c.NK_FORMAT_R8G8B8A8, .offset = vc },
+            .{ .attribute = nk.c.NK_VERTEX_ATTRIBUTE_COUNT, .format = nk.c.NK_FORMAT_COUNT, .offset = 0 },
         };
 
         cmds.clear();
@@ -216,19 +216,19 @@ fn render(program: *Program) void {
             .vertex_layout = &vertex_layout,
             .vertex_size = @sizeOf(GlfwVertex),
             .vertex_alignment = @alignOf(GlfwVertex),
-            .@"null" = program.null_texture,
+            .null_ = program.null_texture,
             .circle_segment_count = 22,
             .curve_segment_count = 22,
             .arc_segment_count = 22,
             .global_alpha = 1.0,
-            .shape_AA = .NK_ANTI_ALIASING_ON,
-            .line_AA = .NK_ANTI_ALIASING_ON,
+            .shape_AA = nk.c.NK_ANTI_ALIASING_ON,
+            .line_AA = nk.c.NK_ANTI_ALIASING_ON,
         });
 
         const vertices = vbuf.memory();
-        c.glVertexPointer(2, c.GL_FLOAT, vs, @ptrCast(*const c_void, @ptrCast([*]const u8, vertices) + vp));
-        c.glTexCoordPointer(2, c.GL_FLOAT, vs, @ptrCast(*const c_void, @ptrCast([*]const u8, vertices) + vt));
-        c.glColorPointer(4, c.GL_UNSIGNED_BYTE, vs, @ptrCast(*const c_void, @ptrCast([*]const u8, vertices) + vc));
+        c.glVertexPointer(2, c.GL_FLOAT, vs, @ptrCast(*const anyopaque, @ptrCast([*]const u8, vertices) + vp));
+        c.glTexCoordPointer(2, c.GL_FLOAT, vs, @ptrCast(*const anyopaque, @ptrCast([*]const u8, vertices) + vt));
+        c.glColorPointer(4, c.GL_UNSIGNED_BYTE, vs, @ptrCast(*const anyopaque, @ptrCast([*]const u8, vertices) + vc));
 
         var offset = @ptrCast(
             [*]const nk.DrawIndex,

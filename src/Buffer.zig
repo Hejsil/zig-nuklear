@@ -9,7 +9,7 @@ const Buffer = @This();
 
 c: c.struct_nk_buffer,
 
-pub fn init(allocator: *mem.Allocator, size: usize) Buffer {
+pub fn init(allocator: *const mem.Allocator, size: usize) Buffer {
     var res: Buffer = undefined;
     c.nk_buffer_init(&res.c, &nk.allocator(allocator), size);
     return res;
@@ -17,7 +17,7 @@ pub fn init(allocator: *mem.Allocator, size: usize) Buffer {
 
 pub fn initFixed(bytes: []u8) Buffer {
     var res: Buffer = undefined;
-    c.nk_buffer_init_fixed(&res.c, @ptrCast(*c_void, bytes.ptr), bytes.len);
+    c.nk_buffer_init_fixed(&res.c, @ptrCast(*anyopaque, bytes.ptr), bytes.len);
     return res;
 }
 
@@ -36,7 +36,7 @@ pub fn push(
     return c.nk_buffer_push(
         &buffer.c,
         type_,
-        @ptrCast(*const c_void, bytes.ptr),
+        @ptrCast(*const anyopaque, bytes.ptr),
         bytes.len,
         @"align",
     );

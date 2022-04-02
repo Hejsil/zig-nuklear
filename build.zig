@@ -64,35 +64,35 @@ pub const Options = struct {
     fn defineMacros(opts: Options, lib: *LibExeObjStep) void {
         const b = lib.builder;
         if (opts.include_fixed_types)
-            lib.defineCMacro("NK_INCLUDE_FIXED_TYPES");
+            lib.defineCMacro("NK_INCLUDE_FIXED_TYPES", null);
         if (opts.include_default_allocator)
-            lib.defineCMacro("NK_INCLUDE_DEFAULT_ALLOCATOR");
+            lib.defineCMacro("NK_INCLUDE_DEFAULT_ALLOCATOR", null);
         if (opts.include_stdio)
-            lib.defineCMacro("NK_INCLUDE_STANDARD_IO");
+            lib.defineCMacro("NK_INCLUDE_STANDARD_IO", null);
         if (opts.include_std_varargs)
-            lib.defineCMacro("NK_INCLUDE_STANDARD_VARARGS");
+            lib.defineCMacro("NK_INCLUDE_STANDARD_VARARGS", null);
         if (opts.include_vertex_buffer_output)
-            lib.defineCMacro("NK_INCLUDE_VERTEX_BUFFER_OUTPUT");
+            lib.defineCMacro("NK_INCLUDE_VERTEX_BUFFER_OUTPUT", null);
         if (opts.include_font_backing)
-            lib.defineCMacro("NK_INCLUDE_FONT_BAKING");
+            lib.defineCMacro("NK_INCLUDE_FONT_BAKING", null);
         if (opts.include_default_font)
-            lib.defineCMacro("NK_INCLUDE_DEFAULT_FONT");
+            lib.defineCMacro("NK_INCLUDE_DEFAULT_FONT", null);
         if (opts.include_command_userdata)
-            lib.defineCMacro("NK_INCLUDE_COMMAND_USERDATA");
+            lib.defineCMacro("NK_INCLUDE_COMMAND_USERDATA", null);
         if (opts.button_trigger_on_release)
-            lib.defineCMacro("NK_BUTTON_TRIGGER_ON_RELEASE");
+            lib.defineCMacro("NK_BUTTON_TRIGGER_ON_RELEASE", null);
         if (opts.zero_command_memory)
-            lib.defineCMacro("NK_ZERO_COMMAND_MEMORY");
+            lib.defineCMacro("NK_ZERO_COMMAND_MEMORY", null);
         if (opts.uint_draw_index)
-            lib.defineCMacro("NK_UINT_DRAW_INDEX");
+            lib.defineCMacro("NK_UINT_DRAW_INDEX", null);
         if (opts.keystate_based_input)
-            lib.defineCMacro("NK_KEYSTATE_BASED_INPUT");
+            lib.defineCMacro("NK_KEYSTATE_BASED_INPUT", null);
         if (opts.buffer_default_initial_size) |size|
-            lib.defineCMacro(b.fmt("NK_BUFFER_DEFAULT_INITIAL_SIZE={}", .{size}));
+            lib.defineCMacro("NK_BUFFER_DEFAULT_INITIAL_SIZE", b.fmt("{}", .{size}));
         if (opts.max_number_buffer) |number|
-            lib.defineCMacro(b.fmt("NK_MAX_NUMBER_BUFFER={}", .{number}));
+            lib.defineCMacro("NK_MAX_NUMBER_BUFFER", b.fmt("{}", .{number}));
         if (opts.input_max) |number|
-            lib.defineCMacro(b.fmt("NK_INPUT_MAX={}", .{number}));
+            lib.defineCMacro("NK_INPUT_MAX", b.fmt("{}", .{number}));
     }
 };
 

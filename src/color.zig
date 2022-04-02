@@ -8,18 +8,14 @@ const testing = std.testing;
 pub const Format = enum(u8) {
     rgb = c.NK_RGB,
     rgba = c.NK_RGBA,
-
-    pub fn toNuklear(format: Format) c.nk_color_format {
-        return @intToEnum(c.nk_color_format, @enumToInt(format));
-    }
 };
 
 pub fn picker(ctx: *nk.Context, color: nk.Colorf, format: Format) nk.Colorf {
-    return c.nk_color_picker(ctx, color, format.toNuklear());
+    return c.nk_color_picker(ctx, color, @enumToInt(format));
 }
 
 pub fn pick(ctx: *nk.Context, color: *nk.Colorf, format: Format) bool {
-    return c.nk_color_pick(ctx, color, format.toNuklear()) != 0;
+    return c.nk_color_pick(ctx, color, @enumToInt(format)) != 0;
 }
 
 test {

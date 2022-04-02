@@ -7,10 +7,6 @@ const testing = std.testing;
 pub const Type = enum(u8) {
     lines = c.NK_CHART_LINES,
     column = c.NK_CHART_COLUMN,
-
-    pub fn toNuklear(_type: Type) c.enum_nk_chart_type {
-        return @intToEnum(c.enum_nk_chart_type, @enumToInt(_type));
-    }
 };
 
 pub const Event = enum(nk.Flags) {
@@ -20,19 +16,19 @@ pub const Event = enum(nk.Flags) {
 };
 
 pub fn begin(ctx: *nk.Context, _type: Type, num: usize, min: f32, max: f32) bool {
-    return c.nk_chart_begin(ctx, _type.toNuklear(), @intCast(c_int, num), min, max) != 0;
+    return c.nk_chart_begin(ctx, @enumToInt(_type), @intCast(c_int, num), min, max) != 0;
 }
 
 pub fn beginColored(ctx: *nk.Context, _type: Type, a: nk.Color, active: nk.Color, num: usize, min: f32, max: f32) bool {
-    return c.nk_chart_begin_colored(ctx, _type.toNuklear(), a, active, @intCast(c_int, num), min, max) != 0;
+    return c.nk_chart_begin_colored(ctx, @enumToInt(_type), a, active, @intCast(c_int, num), min, max) != 0;
 }
 
 pub fn addSlot(ctx: *nk.Context, _type: Type, count: usize, min_value: f32, max_value: f32) void {
-    return c.nk_chart_add_slot(ctx, _type.toNuklear(), @intCast(c_int, count), min_value, max_value);
+    return c.nk_chart_add_slot(ctx, @enumToInt(_type), @intCast(c_int, count), min_value, max_value);
 }
 
 pub fn addSlotColored(ctx: *nk.Context, _type: Type, a: nk.Color, active: nk.Color, count: usize, min_value: f32, max_value: f32) void {
-    return c.nk_chart_add_slot_colored(ctx, _type.toNuklear(), a, active, @intCast(c_int, count), min_value, max_value);
+    return c.nk_chart_add_slot_colored(ctx, @enumToInt(_type), a, active, @intCast(c_int, count), min_value, max_value);
 }
 
 pub fn push(ctx: *nk.Context, value: f32) Event {
@@ -50,7 +46,7 @@ pub fn end(ctx: *nk.Context) void {
 pub fn plot(ctx: *nk.Context, _type: Type, values: []const f32) void {
     return c.nk_plot(
         ctx,
-        _type.toNuklear(),
+        @enumToInt(_type),
         values.ptr,
         @intCast(c_int, values.len),
         0,
@@ -70,7 +66,7 @@ pub fn function(
         userdata: T,
         getter: fn (T, usize) f32,
 
-        fn valueGetter(user: ?*c_void, index: c_int) callconv(.C) f32 {
+        fn valueGetter(user: ?*anyopaque, index: c_int) callconv(.C) f32 {
             const casted = @ptrCast(*const @This(), @alignCast(@alignOf(@This()), user));
             return casted.getter(casted.userdata, @intCast(usize, index));
         }
@@ -79,8 +75,8 @@ pub fn function(
     var wrapped = Wrapped{ .userdata = userdata, .getter = getter };
     return c.nk_plot_function(
         ctx,
-        _type.toNuklear(),
-        @ptrCast(*c_void, &wrapped),
+        @enumToInt(_type),
+        @ptrCast(*anyopaque, &wrapped),
         Wrapped.valueGetter,
         @intCast(c_int, count),
         @intCast(c_int, offset),

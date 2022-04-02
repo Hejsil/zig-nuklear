@@ -27,6 +27,7 @@ pub fn scrolledOffsetBegin(
     ctx: *nk.Context,
     offset: *nk.ScrollOffset,
     comptime Id: type,
+    flags: nk.PanelFlags,
 ) bool {
     const id = nk.typeId(Id);
     var c_x_offset: c.nk_uint = @intCast(c.nk_uint, offset.x);

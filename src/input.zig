@@ -55,13 +55,13 @@ pub fn motion(ctx: *nk.Context, x: c_int, y: c_int) void {
 }
 
 pub fn key(ctx: *nk.Context, keys: Keys, down: bool) void {
-    c.nk_input_key(ctx, @intToEnum(c.enum_nk_keys, @enumToInt(keys)), @boolToInt(down));
+    c.nk_input_key(ctx, @enumToInt(keys), @boolToInt(down));
 }
 
 pub fn button(ctx: *nk.Context, bot: Buttons, x: c_int, y: c_int, down: bool) void {
     c.nk_input_button(
         ctx,
-        @intToEnum(c.enum_nk_buttons, @enumToInt(bot)),
+        @enumToInt(bot),
         x,
         y,
         @boolToInt(down),

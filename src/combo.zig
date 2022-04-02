@@ -73,7 +73,7 @@ pub fn callback(
         userdata: T,
         getter: fn (T, usize) []const u8,
 
-        fn valueGetter(user: ?*c_void, index: c_int, out: [*c]nk.Slice) callconv(.C) void {
+        fn valueGetter(user: ?*anyopaque, index: c_int, out: [*c]nk.Slice) callconv(.C) void {
             const casted = @ptrCast(*const @This(), @alignCast(@alignOf(@This()), user));
             out.* = nk.slice(casted.getter(casted.userdata, @intCast(usize, index)));
         }
@@ -83,7 +83,7 @@ pub fn callback(
     return @intCast(usize, c.nk_combo_callback(
         ctx,
         Wrapped.valueGetter,
-        @ptrCast(*c_void, &wrapped),
+        @ptrCast(*anyopaque, &wrapped),
         @intCast(c_int, selected),
         @intCast(c_int, count),
         @intCast(c_int, item_height),

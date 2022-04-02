@@ -84,7 +84,7 @@ pub fn showcase(ctx: *nk.Context) void {
                 std.log.info("nk.button.symbolLabel", .{});
 
             var style = ctx.style.button;
-            style.normal.type = .NK_STYLE_ITEM_COLOR;
+            style.normal.type = nk.c.NK_STYLE_ITEM_COLOR;
             style.normal.data.color = nk.rgb(20, 20, 20);
             if (nk.button.symbolStyled(ctx, .rect_solid, style))
                 std.log.info("nk.button.symbolStyled", .{});

@@ -9,7 +9,7 @@ const Str = @This();
 
 c: c.struct_nk_str,
 
-pub fn init(allocator: *mem.Allocator, size: usize) Str {
+pub fn init(allocator: mem.Allocator, size: usize) Str {
     var res: Str = undefined;
     c.nk_str_init(&res.c, &nk.allocator(allocator), size);
     return res;
@@ -17,7 +17,7 @@ pub fn init(allocator: *mem.Allocator, size: usize) Str {
 
 pub fn initFixed(bytes: []u8) Str {
     var res: Str = undefined;
-    c.nk_str_init_fixed(&res.c, @ptrCast(*c_void, bytes.ptr), bytes.len);
+    c.nk_str_init_fixed(&res.c, @ptrCast(*anyopaque, bytes.ptr), bytes.len);
     return res;
 }
 

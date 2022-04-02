@@ -9,7 +9,7 @@ const TextEdit = @This();
 
 c: c.struct_nk_text_edit,
 
-pub fn init(a: *mem.Allocator, size: usize) TextEdit {
+pub fn init(a: mem.Allocator, size: usize) TextEdit {
     var res: TextEdit = undefined;
     c.nk_textedit_init(
         &res.c,
@@ -23,7 +23,7 @@ pub fn initFixed(memory: []u8) TextEdit {
     var res: TextEdit = undefined;
     c.nk_textedit_init_fixed(
         &res.c,
-        @ptrCast(*c_void, memory.ptr),
+        @ptrCast(*anyopaque, memory.ptr),
         @intCast(c.nk_size, memory.len),
     );
     return res;

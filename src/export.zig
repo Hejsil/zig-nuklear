@@ -41,7 +41,7 @@ export fn zigNuklearDtoa(out: [*]u8, n: f64) callconv(.C) [*]u8 {
 }
 
 export fn zigNuklearStrlen(str: [*:0]const u8) callconv(.C) c.nk_size {
-    return mem.lenZ(str);
+    return mem.sliceTo(str, 0).len;
 }
 
 export fn zigNuklearMemcopy(dst: [*]u8, src: [*]const u8, n: c.nk_size) callconv(.C) [*]u8 {

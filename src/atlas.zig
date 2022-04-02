@@ -18,13 +18,13 @@ pub const Format = enum(u8) {
     rgba32 = c.NK_FONT_ATLAS_RGBA32,
 };
 
-pub fn init(allocator: *mem.Allocator) nk.FontAtlas {
+pub fn init(allocator: *const mem.Allocator) nk.FontAtlas {
     var res: nk.FontAtlas = undefined;
     c.nk_font_atlas_init(&res, &nk.allocator(allocator));
     return res;
 }
 
-pub fn initCustom(persistent: *mem.Allocator, transient: *mem.Allocator) nk.FontAtlas {
+pub fn initCustom(persistent: mem.Allocator, transient: mem.Allocator) nk.FontAtlas {
     var res: nk.FontAtlas = undefined;
     c.nk_font_atlas_init_custom(
         &res,
@@ -62,7 +62,7 @@ pub fn addFromMemory(
     height: f32,
     config: ?*const Config,
 ) !*Font {
-    const ptr = @ptrCast(*const c_void, memory.ptr);
+    const ptr = @ptrCast(*const anyopaque, memory.ptr);
     return c.nk_font_atlas_add_from_memory(atlas, ptr, memory.len, height, config) orelse
         return error.OutOfMemory;
 }
@@ -73,7 +73,7 @@ pub fn addCompressed(
     height: f32,
     config: ?*const Config,
 ) !*Font {
-    const ptr = @ptrCast(*const c_void, data.ptr);
+    const ptr = @ptrCast(*const anyopaque, data.ptr);
     return c.nk_font_atlas_add_compressed(atlas, ptr, data.len, height, config) orelse
         return error.OutOfMemory;
 }
@@ -95,7 +95,7 @@ pub fn bake(atlas: *nk.FontAtlas, format: Format) !Baked {
         atlas,
         &w,
         &h,
-        @intToEnum(c.enum_nk_font_atlas_format, @enumToInt(format)),
+        @enumToInt(format),
     ) orelse
         return error.OutOfMemory;
 

@@ -180,7 +180,7 @@ pub const rest = struct {
 
     //
 
-    pub fn nkHandlePtr(ptr: ?*c_void) nk.Handle {
+    pub fn nkHandlePtr(ptr: ?*anyopaque) nk.Handle {
         return c.nk_handle_ptr(ptr);
     }
     pub fn nkHandleId(h: c_int) nk.Handle {
@@ -189,7 +189,7 @@ pub const rest = struct {
     pub fn nkImageHandle(h: nk.Handle) nk.Image {
         return c.nk_image_handle(h);
     }
-    pub fn nkImagePtr(ptr: ?*c_void) nk.Image {
+    pub fn nkImagePtr(ptr: ?*anyopaque) nk.Image {
         return c.nk_image_ptr(ptr);
     }
     pub fn nkImageId(_id: c_int) nk.Image {
@@ -198,7 +198,7 @@ pub const rest = struct {
     pub fn nkImageIsSubimage(img: [*c]const nk.Image) bool {
         return c.nk_image_is_subimage(img) != 0;
     }
-    pub fn nkSubimagePtr(ptr: ?*c_void, w: c_ushort, h: c_ushort, sub_region: nk.Rect) nk.Image {
+    pub fn nkSubimagePtr(ptr: ?*anyopaque, w: c_ushort, h: c_ushort, sub_region: nk.Rect) nk.Image {
         return c.nk_subimage_ptr(ptr, w, h, sub_region);
     }
     pub fn nkSubimageId(_id: c_int, w: c_ushort, h: c_ushort, sub_region: nk.Rect) nk.Image {
@@ -422,10 +422,6 @@ pub const SymbolType = enum(u8) {
     triangle_right = c.NK_SYMBOL_TRIANGLE_RIGHT,
     plus = c.NK_SYMBOL_PLUS,
     minus = c.NK_SYMBOL_MINUS,
-
-    pub fn toNuklear(sym: SymbolType) c.enum_nk_symbol_type {
-        return @intToEnum(c.enum_nk_symbol_type, @enumToInt(sym));
-    }
 };
 
 pub const ScrollOffset = struct {
@@ -433,7 +429,7 @@ pub const ScrollOffset = struct {
     y: usize,
 };
 
-pub fn init(alloc: *mem.Allocator, font: ?*const UserFont) Context {
+pub fn init(alloc: *const mem.Allocator, font: ?*const UserFont) Context {
     var res: Context = undefined;
     const status = c.nk_init(&res, &allocator(alloc), font);
 
@@ -546,9 +542,9 @@ pub fn id(comptime T: type) [@sizeOf(usize)]u8 {
     return @bitCast([@sizeOf(usize)]u8, typeId(T));
 }
 
-pub fn allocator(alloc: *mem.Allocator) Allocator {
+pub fn allocator(alloc: *const mem.Allocator) Allocator {
     return .{
-        .userdata = .{ .ptr = @ptrCast(*c_void, alloc) },
+        .userdata = .{ .ptr = discardConst(@ptrCast(*const anyopaque, alloc)) },
         .alloc = heap.alloc,
         .free = heap.free,
     };
@@ -582,8 +578,8 @@ const heap = struct {
         size: usize,
     };
 
-    fn alloc(handle: Handle, m_old: ?*c_void, n: c.nk_size) callconv(.C) ?*c_void {
-        const al = alignPtrCast(*mem.Allocator, handle.ptr);
+    fn alloc(handle: Handle, m_old: ?*anyopaque, n: c.nk_size) callconv(.C) ?*anyopaque {
+        const al = alignPtrCast(*const mem.Allocator, handle.ptr);
 
         const res = if (@ptrCast(?[*]u8, m_old)) |old| blk: {
             const old_with_header = old - header_size;
@@ -592,7 +588,7 @@ const heap = struct {
             const old_mem = old_with_header[0 .. header_size + header.size];
             if (al.resize(old_mem, n + header_size)) |resized| {
                 break :blk resized;
-            } else |_| {}
+            } else {}
 
             // Resize failed. Give the caller new memory instead
             break :blk al.allocAdvanced(u8, header_align, n + header_size, .exact) catch
@@ -605,15 +601,15 @@ const heap = struct {
         // Store the size of the allocation in the extra memory we allocated, and return
         // a pointer after the header.
         alignPtrCast([*]Header, res.ptr)[0] = .{ .size = n };
-        return @ptrCast(*c_void, res[header_size..].ptr);
+        return @ptrCast(*anyopaque, res[header_size..].ptr);
     }
 
-    fn free(handle: Handle, m_old: ?*c_void) callconv(.C) void {
+    fn free(handle: Handle, m_old: ?*anyopaque) callconv(.C) void {
         const old = @ptrCast(?[*]u8, m_old) orelse return;
         const old_with_header = old - header_size;
         const header = alignPtrCast([*]Header, old_with_header)[0];
 
-        const al = alignPtrCast(*mem.Allocator, handle.ptr);
+        const al = alignPtrCast(*const mem.Allocator, handle.ptr);
         al.free(old_with_header[0 .. header_size + header.size]);
     }
 
