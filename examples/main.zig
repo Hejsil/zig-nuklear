@@ -15,6 +15,7 @@ pub fn main() !void {
 
     if (c.glfwInit() == 0)
         return error.InitFailed;
+    defer c.glfwTerminate();
 
     const win = c.glfwCreateWindow(800, 600, "yo", null, null) orelse
         return error.CouldNotCreateWindow;
