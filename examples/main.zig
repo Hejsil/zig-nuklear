@@ -47,7 +47,7 @@ pub fn main() !void {
     ctx.clip.userdata = undefined;
 
     var program = Program{
-        .ctx = ctx,
+        .ctx = &ctx,
         .null_texture = _null,
         .cmds = nk.Buffer.init(&allocator, mem.page_size),
         .vbuf = nk.Buffer.init(&allocator, mem.page_size),
@@ -65,14 +65,14 @@ pub fn main() !void {
 
     while (c.glfwWindowShouldClose(program.win) == 0) {
         program.input();
-        examples.showcase(&program.ctx);
+        examples.showcase(program.ctx);
         program.render();
     }
 }
 
 const Program = @This();
 
-ctx: nk.Context,
+ctx: *nk.Context,
 null_texture: nk.DrawNullTexture,
 cmds: nk.Buffer,
 vbuf: nk.Buffer,
@@ -81,7 +81,7 @@ ebuf: nk.Buffer,
 win: *c.GLFWwindow,
 
 fn input(program: *Program) void {
-    const ctx = &program.ctx;
+    const ctx = program.ctx;
     const win = program.win;
 
     nk.input.begin(ctx);
@@ -156,7 +156,7 @@ const GlfwVertex = extern struct {
 };
 
 fn render(program: *Program) void {
-    const ctx = &program.ctx;
+    const ctx = program.ctx;
     const win = program.win;
     const cmds = &program.cmds;
     const ebuf = &program.ebuf;
@@ -303,11 +303,11 @@ fn scrollCallback(win: ?*c.GLFWwindow, xoffset: f64, yoffset: f64) callconv(.C) 
     var new_scroll = program.ctx.input.mouse.scroll_delta;
     new_scroll.x += @floatCast(f32, xoffset);
     new_scroll.y += @floatCast(f32, yoffset);
-    nk.input.scroll(&program.ctx, new_scroll);
+    nk.input.scroll(program.ctx, new_scroll);
 }
 
 fn charCallback(win: ?*c.GLFWwindow, codepoint: c_uint) callconv(.C) void {
     const usrptr = c.glfwGetWindowUserPointer(win);
     const program = @ptrCast(*Program, @alignCast(@alignOf(Program), usrptr));
-    nk.input.unicode(&program.ctx, @intCast(u21, codepoint));
+    nk.input.unicode(program.ctx, @intCast(u21, codepoint));
 }
